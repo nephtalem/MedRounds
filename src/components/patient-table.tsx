@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -51,6 +52,7 @@ export function PatientTable({
   onEdit,
   onDelete,
 }: PatientTableProps) {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -99,6 +101,10 @@ export function PatientTable({
     setExpandedRows(newExpanded);
   };
 
+  const handleRowClick = (patientId: string) => {
+    router.push(`/patients/${patientId}`);
+  };
+
   const openDeleteDialog = (patient: Patient) => {
     setPatientToDelete({ id: patient.id, name: patient.name });
     setDeleteDialogOpen(true);
@@ -117,12 +123,12 @@ export function PatientTable({
       {/* Search Bar and Page Size */}
       <div className="flex items-center gap-3 print-hide">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
           <Input
             placeholder="Search patients by name, diagnosis, medications..."
             value={searchTerm}
             onChange={(e) => handleSearchChange(e.target.value)}
-            className="pl-10 h-12 border-2 focus:border-blue-500"
+            className="pl-10 h-12 border-2 focus:border-blue-500 dark:bg-slate-800/50 dark:border-slate-700 dark:text-gray-200 dark:placeholder:text-gray-500"
           />
         </div>
         {searchTerm && (
@@ -153,20 +159,20 @@ export function PatientTable({
 
       {/* Results Count */}
       <div className="flex items-center justify-between print-hide">
-        <p className="text-sm font-medium text-gray-600">
+        <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
           Showing{" "}
-          <span className="font-bold text-gray-900">
+          <span className="font-bold text-gray-900 dark:text-gray-100">
             {startIndex + 1}-{Math.min(endIndex, filteredPatients.length)}
           </span>{" "}
           of{" "}
-          <span className="font-bold text-gray-900">
+          <span className="font-bold text-gray-900 dark:text-gray-100">
             {filteredPatients.length}
           </span>{" "}
           patients
           {searchTerm && ` (filtered from ${patients.length} total)`}
         </p>
-        <div className="flex items-center gap-2 text-xs text-gray-600 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-200">
-          <ChevronRight className="h-3.5 w-3.5 text-blue-600" />
+        <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-300 bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-full border border-blue-200 dark:border-blue-800">
+          <ChevronRight className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
           <span>
             Click <span className="font-semibold">chevron icons</span> to
             expand/collapse
@@ -179,41 +185,41 @@ export function PatientTable({
         <div className="overflow-x-auto">
           <Table className="patient-table">
             <TableHeader>
-              <TableRow className="bg-gradient-to-r from-blue-50 to-cyan-50 border-b-2 border-blue-200">
-                <TableHead className="font-bold text-gray-900 text-xs">
+              <TableRow className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-slate-800 dark:to-slate-700 border-b-2 border-blue-200 dark:border-slate-600">
+                <TableHead className="font-bold text-gray-900 dark:text-gray-100 text-xs">
                   #
                 </TableHead>
-                <TableHead className="font-bold text-gray-900 text-xs">
+                <TableHead className="font-bold text-gray-900 dark:text-gray-100 text-xs">
                   Name
                 </TableHead>
-                <TableHead className="font-bold text-gray-900 text-xs">
+                <TableHead className="font-bold text-gray-900 dark:text-gray-100 text-xs">
                   Brief History
                 </TableHead>
-                <TableHead className="font-bold text-gray-900 text-xs">
+                <TableHead className="font-bold text-gray-900 dark:text-gray-100 text-xs">
                   Diagnosis
                 </TableHead>
-                <TableHead className="font-bold text-gray-900 text-xs">
+                <TableHead className="font-bold text-gray-900 dark:text-gray-100 text-xs">
                   Physical Exam
                 </TableHead>
-                <TableHead className="font-bold text-gray-900 text-xs">
+                <TableHead className="font-bold text-gray-900 dark:text-gray-100 text-xs">
                   Imaging
                 </TableHead>
-                <TableHead className="font-bold text-gray-900 text-xs">
+                <TableHead className="font-bold text-gray-900 dark:text-gray-100 text-xs">
                   Lab Result
                 </TableHead>
-                <TableHead className="font-bold text-gray-900 text-xs">
+                <TableHead className="font-bold text-gray-900 dark:text-gray-100 text-xs">
                   Incident
                 </TableHead>
-                <TableHead className="font-bold text-gray-900 text-xs">
+                <TableHead className="font-bold text-gray-900 dark:text-gray-100 text-xs">
                   Medications
                 </TableHead>
-                <TableHead className="font-bold text-gray-900 text-xs">
+                <TableHead className="font-bold text-gray-900 dark:text-gray-100 text-xs">
                   Plan
                 </TableHead>
-                <TableHead className="font-bold text-gray-900 text-xs">
+                <TableHead className="font-bold text-gray-900 dark:text-gray-100 text-xs">
                   Round
                 </TableHead>
-                <TableHead className="print-hide font-bold text-gray-900 text-xs">
+                <TableHead className="print-hide font-bold text-gray-900 dark:text-gray-100 text-xs">
                   Actions
                 </TableHead>
               </TableRow>
@@ -223,16 +229,16 @@ export function PatientTable({
                 <TableRow>
                   <TableCell colSpan={12} className="text-center py-16">
                     <div className="flex flex-col items-center gap-3">
-                      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
-                        <Search className="h-8 w-8 text-gray-400" />
+                      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
+                        <Search className="h-8 w-8 text-gray-400 dark:text-gray-500" />
                       </div>
                       <div>
-                        <p className="font-semibold text-gray-900 mb-1">
+                        <p className="font-semibold text-gray-900 dark:text-gray-100 mb-1">
                           {searchTerm
                             ? "No patients found"
                             : "No patients added yet"}
                         </p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
                           {searchTerm
                             ? "Try adjusting your search terms"
                             : "Add your first patient to get started"}
@@ -242,25 +248,28 @@ export function PatientTable({
                   </TableCell>
                 </TableRow>
               ) : (
-                paginatedPatients.map((patient, index) => {
+                paginatedPatients.map((patient) => {
                   const isExpanded = expandedRows.has(patient.id);
-                  const actualIndex = startIndex + index + 1;
                   return (
                     <TableRow
                       key={patient.id}
-                      className={`transition-all duration-200 border-b ${
+                      onClick={() => handleRowClick(patient.id)}
+                      className={`transition-all duration-200 border-b cursor-pointer ${
                         isExpanded
                           ? "bg-blue-50/30 border-blue-200 shadow-sm"
-                          : "border-gray-100 hover:bg-blue-50/50"
+                          : "border-gray-100 hover:bg-blue-50/50 hover:shadow-sm"
                       }`}
                     >
-                      <TableCell className="font-semibold text-gray-700 text-sm">
-                        {actualIndex}
+                      <TableCell className="font-semibold text-gray-700 dark:text-gray-300 text-sm">
+                        {patient.serial_no || "-"}
                       </TableCell>
-                      <TableCell className="font-semibold text-gray-900">
+                      <TableCell className="font-semibold text-gray-900 dark:text-gray-100">
                         <div className="flex items-center gap-3">
                           <button
-                            onClick={() => toggleRow(patient.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleRow(patient.id);
+                            }}
                             className={`print-hide rounded-full p-1.5 transition-all duration-200 ${
                               isExpanded
                                 ? "bg-blue-500 hover:bg-blue-600 shadow-sm"
@@ -281,7 +290,7 @@ export function PatientTable({
                         <div
                           className={`${
                             isExpanded ? "" : "line-clamp-3"
-                          } print:line-clamp-none text-sm text-gray-700 leading-relaxed`}
+                          } print:line-clamp-none text-sm text-gray-700 dark:text-gray-300 leading-relaxed`}
                         >
                           {patient.brief_history || "-"}
                         </div>
@@ -289,7 +298,10 @@ export function PatientTable({
                           patient.brief_history &&
                           patient.brief_history.length > 100 && (
                             <button
-                              onClick={() => toggleRow(patient.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleRow(patient.id);
+                              }}
                               className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-semibold mt-2 px-2.5 py-1 rounded-md hover:bg-blue-100 transition-all duration-200 print-hide"
                             >
                               Show more
@@ -301,7 +313,7 @@ export function PatientTable({
                         <div
                           className={`${
                             isExpanded ? "" : "line-clamp-2"
-                          } print:line-clamp-none text-sm text-gray-700 leading-relaxed`}
+                          } print:line-clamp-none text-sm text-gray-700 dark:text-gray-300 leading-relaxed`}
                         >
                           {patient.diagnosis || "-"}
                         </div>
@@ -310,7 +322,7 @@ export function PatientTable({
                         <div
                           className={`${
                             isExpanded ? "" : "line-clamp-3"
-                          } print:line-clamp-none text-sm text-gray-700 leading-relaxed`}
+                          } print:line-clamp-none text-sm text-gray-700 dark:text-gray-300 leading-relaxed`}
                         >
                           {patient.physical_examination || "-"}
                         </div>
@@ -319,7 +331,7 @@ export function PatientTable({
                         <div
                           className={`${
                             isExpanded ? "" : "line-clamp-2"
-                          } print:line-clamp-none text-sm text-gray-700 leading-relaxed`}
+                          } print:line-clamp-none text-sm text-gray-700 dark:text-gray-300 leading-relaxed`}
                         >
                           {patient.imaging || "-"}
                         </div>
@@ -328,7 +340,7 @@ export function PatientTable({
                         <div
                           className={`${
                             isExpanded ? "" : "line-clamp-2"
-                          } print:line-clamp-none text-sm text-gray-700 leading-relaxed`}
+                          } print:line-clamp-none text-sm text-gray-700 dark:text-gray-300 leading-relaxed`}
                         >
                           {patient.lab_result || "-"}
                         </div>
@@ -337,7 +349,7 @@ export function PatientTable({
                         <div
                           className={`${
                             isExpanded ? "" : "line-clamp-2"
-                          } print:line-clamp-none text-sm text-gray-700 leading-relaxed`}
+                          } print:line-clamp-none text-sm text-gray-700 dark:text-gray-300 leading-relaxed`}
                         >
                           {patient.incident || "-"}
                         </div>
@@ -346,7 +358,7 @@ export function PatientTable({
                         <div
                           className={`${
                             isExpanded ? "" : "line-clamp-3"
-                          } print:line-clamp-none text-sm text-gray-700 leading-relaxed`}
+                          } print:line-clamp-none text-sm text-gray-700 dark:text-gray-300 leading-relaxed`}
                         >
                           {patient.medications || "-"}
                         </div>
@@ -355,12 +367,12 @@ export function PatientTable({
                         <div
                           className={`${
                             isExpanded ? "" : "line-clamp-3"
-                          } print:line-clamp-none text-sm text-gray-700 leading-relaxed`}
+                          } print:line-clamp-none text-sm text-gray-700 dark:text-gray-300 leading-relaxed`}
                         >
                           {patient.plan || "-"}
                         </div>
                       </TableCell>
-                      <TableCell className="text-sm text-gray-600">
+                      <TableCell className="text-sm text-gray-600 dark:text-gray-300">
                         {patient.round || "-"}
                       </TableCell>
                       <TableCell className="print-hide">
@@ -368,7 +380,10 @@ export function PatientTable({
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => onEdit(patient)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onEdit(patient);
+                            }}
                             className="hover:bg-blue-50 hover:text-blue-700"
                             title="Edit patient"
                           >
@@ -377,7 +392,10 @@ export function PatientTable({
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => openDeleteDialog(patient)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openDeleteDialog(patient);
+                            }}
                             className="hover:bg-red-50 hover:text-red-700"
                             title="Delete patient"
                           >
@@ -398,76 +416,76 @@ export function PatientTable({
       <div className="hidden print:block">
         <Table className="patient-table">
           <TableHeader>
-            <TableRow className="bg-gradient-to-r from-blue-50 to-cyan-50 border-b-2 border-blue-200">
-              <TableHead className="font-bold text-gray-900 text-xs">
+            <TableRow className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-slate-800 dark:to-slate-700 border-b-2 border-blue-200 dark:border-slate-600">
+              <TableHead className="font-bold text-gray-900 dark:text-gray-100 text-xs">
                 #
               </TableHead>
-              <TableHead className="font-bold text-gray-900 text-xs">
+              <TableHead className="font-bold text-gray-900 dark:text-gray-100 text-xs">
                 Name
               </TableHead>
-              <TableHead className="font-bold text-gray-900 text-xs">
+              <TableHead className="font-bold text-gray-900 dark:text-gray-100 text-xs">
                 Brief History
               </TableHead>
-              <TableHead className="font-bold text-gray-900 text-xs">
+              <TableHead className="font-bold text-gray-900 dark:text-gray-100 text-xs">
                 Diagnosis
               </TableHead>
-              <TableHead className="font-bold text-gray-900 text-xs">
+              <TableHead className="font-bold text-gray-900 dark:text-gray-100 text-xs">
                 Physical Exam
               </TableHead>
-              <TableHead className="font-bold text-gray-900 text-xs">
+              <TableHead className="font-bold text-gray-900 dark:text-gray-100 text-xs">
                 Imaging
               </TableHead>
-              <TableHead className="font-bold text-gray-900 text-xs">
+              <TableHead className="font-bold text-gray-900 dark:text-gray-100 text-xs">
                 Lab Result
               </TableHead>
-              <TableHead className="font-bold text-gray-900 text-xs">
+              <TableHead className="font-bold text-gray-900 dark:text-gray-100 text-xs">
                 Incident
               </TableHead>
-              <TableHead className="font-bold text-gray-900 text-xs">
+              <TableHead className="font-bold text-gray-900 dark:text-gray-100 text-xs">
                 Medications
               </TableHead>
-              <TableHead className="font-bold text-gray-900 text-xs">
+              <TableHead className="font-bold text-gray-900 dark:text-gray-100 text-xs">
                 Plan
               </TableHead>
-              <TableHead className="font-bold text-gray-900 text-xs">
+              <TableHead className="font-bold text-gray-900 dark:text-gray-100 text-xs">
                 Round
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredPatients.map((patient, index) => (
+            {filteredPatients.map((patient) => (
               <TableRow key={patient.id} className="border-b border-gray-100">
-                <TableCell className="font-semibold text-gray-700 text-sm">
-                  {index + 1}
+                <TableCell className="font-semibold text-gray-700 dark:text-gray-300 text-sm">
+                  {patient.serial_no || "-"}
                 </TableCell>
-                <TableCell className="font-semibold text-gray-900 text-sm">
+                <TableCell className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
                   {patient.name || "-"}
                 </TableCell>
-                <TableCell className="text-sm text-gray-700 leading-relaxed">
+                <TableCell className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
                   {patient.brief_history || "-"}
                 </TableCell>
-                <TableCell className="text-sm text-gray-700 leading-relaxed">
+                <TableCell className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
                   {patient.diagnosis || "-"}
                 </TableCell>
-                <TableCell className="text-sm text-gray-700 leading-relaxed">
+                <TableCell className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
                   {patient.physical_examination || "-"}
                 </TableCell>
-                <TableCell className="text-sm text-gray-700 leading-relaxed">
+                <TableCell className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
                   {patient.imaging || "-"}
                 </TableCell>
-                <TableCell className="text-sm text-gray-700 leading-relaxed">
+                <TableCell className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
                   {patient.lab_result || "-"}
                 </TableCell>
-                <TableCell className="text-sm text-gray-700 leading-relaxed">
+                <TableCell className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
                   {patient.incident || "-"}
                 </TableCell>
-                <TableCell className="text-sm text-gray-700 leading-relaxed">
+                <TableCell className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
                   {patient.medications || "-"}
                 </TableCell>
-                <TableCell className="text-sm text-gray-700 leading-relaxed">
+                <TableCell className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
                   {patient.plan || "-"}
                 </TableCell>
-                <TableCell className="text-sm text-gray-600">
+                <TableCell className="text-sm text-gray-600 dark:text-gray-300">
                   {patient.round || "-"}
                 </TableCell>
               </TableRow>
@@ -504,10 +522,15 @@ export function PatientTable({
             </Button>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-gray-600 dark:text-gray-300">
               Page{" "}
-              <span className="font-bold text-gray-900">{currentPage}</span> of{" "}
-              <span className="font-bold text-gray-900">{totalPages}</span>
+              <span className="font-bold text-gray-900 dark:text-gray-100">
+                {currentPage}
+              </span>{" "}
+              of{" "}
+              <span className="font-bold text-gray-900 dark:text-gray-100">
+                {totalPages}
+              </span>
             </span>
             {totalPages <= 10 && (
               <div className="flex gap-1 ml-4">
@@ -535,8 +558,10 @@ export function PatientTable({
       )}
 
       {/* Print Info */}
-      <div className="print-hide text-sm text-gray-600 bg-blue-50 p-4 rounded-lg border-2 border-blue-200">
-        <p className="font-semibold text-gray-900 mb-1">📄 Print Tips:</p>
+      <div className="print-hide text-sm text-gray-600 dark:text-gray-300 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border-2 border-blue-200 dark:border-blue-800">
+        <p className="font-semibold text-gray-900 dark:text-gray-100 mb-1">
+          📄 Print Tips:
+        </p>
         <ul className="space-y-1 text-xs">
           <li>
             • When printing, ALL patients will be shown (pagination is only for

@@ -44,35 +44,48 @@
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 7%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 7%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217 91% 65%;
-    --primary-foreground: 222.2 84% 4.9%;
-    --secondary: 188 94% 48%;
-    --secondary-foreground: 222.2 84% 4.9%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 188 94% 48%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 50.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 217 91% 65%;
+    /* 🌙 Ultra Modern Dark Mode - Like Notion, Linear, Vercel */
+    --background: 224 71% 4%;         /* Deep rich blue-black (#030712) */
+    --foreground: 213 31% 91%;        /* Soft white (#E1E7EF) */
+    --card: 222 47% 11%;              /* Elevated slate-blue (#141B2B) */
+    --card-foreground: 213 31% 91%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 213 31% 91%;
+    
+    /* 💎 Vibrant Primary - Modern Electric Blue */
+    --primary: 217 91% 60%;           /* Bright blue (#3B82F6) */
+    --primary-foreground: 0 0% 100%;
+    
+    /* ✨ Accent - Vivid Cyan */
+    --secondary: 189 94% 60%;         /* Bright cyan (#22D3EE) */
+    --secondary-foreground: 222 47% 11%;
+    
+    /* 🎨 Muted - Rich Slate */
+    --muted: 215 28% 17%;             /* Slate (#1E293B) */
+    --muted-foreground: 215 16% 65%;  /* Muted text (#94A3B8) */
+    
+    /* 🔥 Accent States */
+    --accent: 215 28% 17%;
+    --accent-foreground: 213 31% 91%;
+    
+    /* ⚠️ Destructive - Vibrant Red */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* 📐 Borders - Subtle with blue hint */
+    --border: 215 28% 17%;            /* Visible slate borders */
+    --input: 215 28% 17%;
+    --ring: 217 91% 60%;
 
-    /* Dark mode sidebar */
-    --sidebar: 222.2 84% 7%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 217 91% 65%;
-    --sidebar-primary-foreground: 222.2 84% 4.9%;
-    --sidebar-accent: 217.2 32.6% 17.5%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 217.2 32.6% 17.5%;
-    --sidebar-ring: 217 91% 65%;
+    /* 🎯 Premium Sidebar */
+    --sidebar: 222 47% 7%;            /* Deep sidebar (#0B1120) */
+    --sidebar-foreground: 213 31% 91%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 215 28% 17%;
+    --sidebar-accent-foreground: 213 31% 91%;
+    --sidebar-border: 215 28% 17%;
+    --sidebar-ring: 217 91% 60%;
   }
 }
 
@@ -96,6 +109,10 @@
   border-radius: 0px;
 }
 
+.dark ::-webkit-scrollbar-track {
+  background: #030712;
+}
+
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
   border-radius: 6px;
@@ -103,9 +120,21 @@
   transition: all 0.3s ease;
 }
 
+.dark ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%);
+  border: 2px solid #030712;
+  border-radius: 6px;
+}
+
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
   border: 2px solid #e2e8f0;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #93c5fd 0%, #60a5fa 100%);
+  border: 2px solid #030712;
+  box-shadow: 0 0 15px rgba(96, 165, 250, 0.4);
 }
 
 ::-webkit-scrollbar-thumb:active {
@@ -116,6 +145,10 @@
 * {
   scrollbar-width: thin;
   scrollbar-color: #3b82f6 #f1f5f9;
+}
+
+.dark * {
+  scrollbar-color: #60a5fa #030712;
 }
 
 /* Print Styles for Patient Rounds */
@@ -497,10 +530,28 @@
     vertical-align: top !important;
     padding: 0.75rem !important;
     white-space: nowrap;
+    background-color: #f8fafc !important;
+  }
+
+  .dark .patient-table thead th {
+    background-color: #1e293b !important;
+    color: #e1e7ef !important;
+    border-color: #334155 !important;
   }
 
   .patient-table tbody tr {
     transition: all 0.2s ease;
+    background-color: white;
+  }
+
+  .dark .patient-table tbody tr {
+    background-color: #0f172a;
+    border-color: #1e293b;
+  }
+
+  .dark .patient-table tbody tr:hover {
+    background-color: #1e293b !important;
+    cursor: pointer;
   }
 
   .patient-table tbody td {
@@ -509,6 +560,12 @@
     word-wrap: break-word;
     overflow-wrap: break-word;
     white-space: normal;
+    border-color: #e2e8f0;
+  }
+
+  .dark .patient-table tbody td {
+    border-color: #1e293b !important;
+    color: #cbd5e1 !important;
   }
 
   .patient-table tbody td > div {
@@ -603,6 +660,113 @@
   /* Avatar modern */
   .avatar-modern {
     position: relative;
+  }
+
+  /* Premium Card Effects for Dark Mode */
+  .dark .shadow-soft {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.4);
+  }
+
+  .dark .shadow-medium {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  .dark .shadow-strong {
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.25),
+      0 4px 8px rgba(59, 130, 246, 0.15);
+  }
+
+  /* Glass morphism for dark mode */
+  .dark .sidebar-glass {
+    background: rgba(15, 20, 25, 0.95);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+  }
+
+  /* Card glow effect on hover (dark mode only) */
+  @media (prefers-color-scheme: dark) {
+    .dark .card-glow:hover {
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.15),
+        0 0 40px rgba(59, 130, 246, 0.1);
+    }
+  }
+
+  /* 🎨 Modern Dark Mode Enhancements */
+  .dark {
+    /* Ensure background is applied */
+    color-scheme: dark;
+  }
+
+  .dark body {
+    background-color: #030712 !important;
+    color: #e1e7ef !important;
+  }
+
+  /* Card improvements */
+  .dark [class*="card"],
+  .dark [class*="Card"] {
+    background-color: #141B2B !important;
+    border-color: #1e293b !important;
+  }
+
+  /* Better contrast for badges */
+  .dark .badge,
+  .dark [class*="badge"] {
+    background-color: #1e293b !important;
+    color: #94a3b8 !important;
+  }
+
+  /* Input fields */
+  .dark input,
+  .dark textarea,
+  .dark select {
+    background-color: #0f172a !important;
+    border-color: #1e293b !important;
+    color: #e1e7ef !important;
+  }
+
+  .dark input:focus,
+  .dark textarea:focus,
+  .dark select:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+  }
+
+  .dark input::placeholder,
+  .dark textarea::placeholder {
+    color: #64748b !important;
+  }
+
+  /* Buttons */
+  .dark button:not([class*="bg-"]):not([class*="Button"]) {
+    background-color: #1e293b !important;
+    color: #e1e7ef !important;
+  }
+
+  /* Hover states for interactive elements */
+  .dark button:hover:not(:disabled),
+  .dark [role="button"]:hover {
+    background-color: #334155 !important;
+  }
+
+  /* Dialogs and popovers */
+  .dark [role="dialog"],
+  .dark [data-radix-popper-content-wrapper] {
+    background-color: #141B2B !important;
+    border-color: #1e293b !important;
+  }
+
+  /* Dropdown menus */
+  .dark [role="menu"],
+  .dark [role="listbox"] {
+    background-color: #141B2B !important;
+    border-color: #1e293b !important;
+  }
+
+  /* Selection styling */
+  .dark ::selection {
+    background-color: rgba(59, 130, 246, 0.3) !important;
+    color: #e1e7ef !important;
   }
 }
 

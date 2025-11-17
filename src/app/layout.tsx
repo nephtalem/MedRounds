@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "sonner";
 
 const geistSans = Geist({
@@ -34,25 +35,26 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ErrorBoundary>
-          <AuthProvider>{children}</AuthProvider>
-        </ErrorBoundary>
-        <Toaster 
-          position="top-right" 
-          richColors 
-          closeButton
-          expand={false}
-          toastOptions={{
-            style: {
-              background: 'white',
-              border: '1px solid #e5e7eb',
-            },
-          }}
-        />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <ErrorBoundary>
+            <AuthProvider>{children}</AuthProvider>
+          </ErrorBoundary>
+          <Toaster 
+            position="top-right" 
+            richColors 
+            closeButton
+            expand={false}
+          />
+        </ThemeProvider>
       </body>
     </html>
   );

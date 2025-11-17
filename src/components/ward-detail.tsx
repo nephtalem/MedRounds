@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import Link from "next/link";
-import { useParams } from "next/navigation";
 import { useReactToPrint } from "react-to-print";
 import { useAuth } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
@@ -23,10 +21,10 @@ import {
   Calendar,
   Users,
   Printer,
-  ArrowLeft,
   Download,
   FileSpreadsheet,
   FileText,
+  Building2,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -40,7 +38,11 @@ import {
   exportPatientsToPDF,
 } from "@/lib/export";
 
-function RoundDetailContent({ roundId }: { roundId: string }) {
+interface WardDetailProps {
+  wardName: string;
+}
+
+function WardDetailContent({ wardName }: WardDetailProps) {
   const { user } = useAuth();
   const [round, setRound] = useState<Round | null>(null);
   const [patients, setPatients] = useState<Patient[]>([]);
@@ -52,7 +54,7 @@ function RoundDetailContent({ roundId }: { roundId: string }) {
 
   // Get print header settings from user metadata or use defaults
   const printHeader =
-    user?.user_metadata?.print_header || "Axon Neurology Specialty Center";
+    user?.user_metadata?.print_header || "Axon Stroke and Spine Center";
   const printSubheader =
     user?.user_metadata?.print_subheader || "Daily Patient Rounds";
   const doctorName =
@@ -61,9 +63,7 @@ function RoundDetailContent({ roundId }: { roundId: string }) {
   // Configure react-to-print
   const handlePrint = useReactToPrint({
     contentRef: printRef,
-    documentTitle: `${round?.round_number || "Round"} - ${new Date(
-      round?.date || ""
-    ).toLocaleDateString()}`,
+    documentTitle: `${wardName} - ${new Date().toLocaleDateString()}`,
     pageStyle: `
       @page {
         size: A4 landscape;
@@ -83,30 +83,49 @@ function RoundDetailContent({ roundId }: { roundId: string }) {
   useEffect(() => {
     loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roundId]);
+  }, [wardName]);
 
   async function loadData() {
     try {
       setLoading(true);
-      const [roundData, patientsData] = await Promise.all([
-        roundsDB.getById(roundId),
-        patientsDB.getByRound(roundId),
-      ]);
-      setRound(roundData);
+      // Find the round by ward name (round_number)
+      const allRounds = await roundsDB.getAll();
+      const wardRound = allRounds.find(r => r.round_number === wardName);
+      
+      if (!wardRound) {
+        setRound(null);
+        setPatients([]);
+        return;
+      }
+
+      const patientsData = await patientsDB.getByRound(wardRound.id);
+      setRound(wardRound);
       setPatients(patientsData);
     } catch (error) {
-      console.error("Error loading data:", error);
-      alert("Failed to load round data");
+      console.error("Error loading ward data:", error);
+      toast.error("Failed to load ward data");
     } finally {
       setLoading(false);
     }
   }
 
+  async function updateRoundDate(roundId: string) {
+    try {
+      // Update round date to current timestamp
+      await roundsDB.update(roundId, { date: new Date().toISOString() });
+    } catch (error) {
+      console.error("Error updating round date:", error);
+    }
+  }
+
   async function handleAddPatient(data: PatientFormData) {
+    if (!round) return;
+    
     const toastId = toast.loading("Adding patient...");
 
     try {
-      await patientsDB.create(roundId, data);
+      await patientsDB.create(round.id, data);
+      await updateRoundDate(round.id);
       toast.success("Patient added successfully!", { id: toastId });
       await loadData();
     } catch (error) {
@@ -117,12 +136,13 @@ function RoundDetailContent({ roundId }: { roundId: string }) {
   }
 
   async function handleEditPatient(data: PatientFormData) {
-    if (!editingPatient) return;
+    if (!editingPatient || !round) return;
 
     const toastId = toast.loading("Updating patient...");
 
     try {
       await patientsDB.update(editingPatient.id, data);
+      await updateRoundDate(round.id);
       toast.success("Patient updated successfully!", { id: toastId });
       await loadData();
       setEditingPatient(null);
@@ -134,10 +154,13 @@ function RoundDetailContent({ roundId }: { roundId: string }) {
   }
 
   async function handleDeletePatient(patientId: string) {
+    if (!round) return;
+    
     const toastId = toast.loading("Deleting patient...");
 
     try {
       await patientsDB.delete(patientId);
+      await updateRoundDate(round.id);
       toast.success("Patient deleted successfully!", { id: toastId });
       await loadData();
     } catch (error) {
@@ -159,26 +182,20 @@ function RoundDetailContent({ roundId }: { roundId: string }) {
   }
 
   function handleExportExcel() {
-    if (!round) return;
-    const roundName = round.round_number || "Round";
-    exportPatientsToExcel(patients, roundName);
+    exportPatientsToExcel(patients, wardName);
     toast.success("Exported to Excel successfully!");
   }
 
   function handleExportCSV() {
-    if (!round) return;
-    const roundName = round.round_number || "Round";
-    exportPatientsToCSV(patients, roundName);
+    exportPatientsToCSV(patients, wardName);
     toast.success("Exported to CSV successfully!");
   }
 
   function handleExportPDF() {
-    if (!round) return;
-    const roundName = round.round_number || "Round";
-    const roundDate = new Date(round.date).toLocaleDateString();
+    const roundDate = round ? new Date(round.date).toLocaleDateString() : new Date().toLocaleDateString();
     exportPatientsToPDF(
       patients,
-      roundName,
+      wardName,
       roundDate,
       printHeader,
       printSubheader,
@@ -189,10 +206,10 @@ function RoundDetailContent({ roundId }: { roundId: string }) {
 
   if (loading) {
     return (
-      <div className="flex h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50">
+      <div className="flex h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50 dark:from-[#030712] dark:via-slate-900/50 dark:to-[#030712]">
         <ModernSidebar />
         <main className="flex-1 flex flex-col overflow-hidden md:ml-64">
-          <ModernHeader title="Loading Round..." />
+          <ModernHeader title={`Loading ${wardName}...`} />
           <div className="flex-1 overflow-auto p-6 space-y-6">
             {/* Loading skeleton */}
             <div className="max-w-[1600px] mx-auto space-y-6">
@@ -202,7 +219,7 @@ function RoundDetailContent({ roundId }: { roundId: string }) {
                 <Skeleton className="h-5 w-64 bg-gray-200" />
               </div>
 
-              {/* Round info card skeleton */}
+              {/* Ward info card skeleton */}
               <div className="p-6 border rounded-lg space-y-4 bg-white">
                 <Skeleton className="h-6 w-40 bg-gray-300" />
                 <div className="grid grid-cols-2 gap-4">
@@ -229,26 +246,25 @@ function RoundDetailContent({ roundId }: { roundId: string }) {
 
   if (!round) {
     return (
-      <div className="flex h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50">
+      <div className="flex h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50 dark:from-[#030712] dark:via-slate-900/50 dark:to-[#030712]">
         <ModernSidebar />
         <main className="flex-1 flex flex-col overflow-hidden md:ml-64">
-          <ModernHeader title="Round Not Found" />
+          <ModernHeader title={`${wardName} Not Found`} />
           <div className="flex-1 flex items-center justify-center">
-            <div className="text-center space-y-4">
+            <div className="text-center space-y-4 max-w-md">
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-100 mx-auto">
                 <Loader2 className="h-8 w-8 text-red-600" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900">
-                Round Not Found
+                {wardName} Not Found
               </h2>
               <p className="text-gray-600">
-                This round does not exist or you don&apos;t have access to it
+                This ward has not been set up yet. Please run the SQL setup script to create the 3 permanent wards (Ward 3, Ward 4, ICU).
               </p>
-              <Button asChild className="mt-4">
-                <Link href="/dashboard">
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                </Link>
-              </Button>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
+                <p className="text-sm text-blue-800 font-medium">💡 Setup Required</p>
+                <p className="text-sm text-blue-700 mt-1">Run <code className="bg-blue-100 px-2 py-1 rounded">setup-permanent-rounds.sql</code> in your Supabase SQL editor</p>
+              </div>
             </div>
           </div>
         </main>
@@ -257,66 +273,85 @@ function RoundDetailContent({ roundId }: { roundId: string }) {
   }
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50">
+    <div className="flex h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50 dark:from-[#030712] dark:via-slate-900/50 dark:to-[#030712]">
       <ModernSidebar />
 
       <main className="flex-1 flex flex-col overflow-hidden md:ml-64">
         <ModernHeader
-          title="Round Details"
-          subtitle={`${new Date(round.date).toLocaleDateString()} • ${
+          title={wardName}
+          subtitle={`Last updated: ${new Date(round.date).toLocaleString()} • ${
             patients.length
           } patient${patients.length !== 1 ? "s" : ""}`}
         />
 
-        <div className="flex-1 overflow-auto p-6 print:p-0">
+        <div className="flex-1 overflow-auto p-4 sm:p-6 print:p-0">
           {/* Page Header */}
           <div className="max-w-[1600px] mx-auto mb-6 print-hide">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <Button variant="ghost" size="sm" asChild>
-                  <Link href="/rounds">
-                    <ArrowLeft className="h-4 w-4 mr-2" />
-                  </Link>
-                </Button>
-                <div>
-                  <h1 className="text-3xl font-bold text-gray-900">
-                    Round Details
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              {/* Left: Ward Icon and Title */}
+              <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+                <div className="flex h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 shadow-lg">
+                  <Building2 className="h-5 w-5 sm:h-6 sm:w-6 text-white" strokeWidth={2.5} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 truncate">
+                    {wardName}
                   </h1>
-                  <p className="text-sm text-gray-600 mt-1">
-                    {new Date(round.date).toLocaleDateString()} •{" "}
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mt-0.5 sm:mt-1 truncate">
+                    Last updated: {new Date(round.date).toLocaleString()} •{" "}
                     {patients.length} patient
                     {patients.length !== 1 ? "s" : ""}
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
+
+              {/* Right: Action Buttons */}
+              <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                {/* Export Dropdown */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="gap-2 dark:bg-slate-800/50 dark:border-slate-700 dark:hover:bg-slate-700/50 dark:text-gray-200 h-9 sm:h-10"
+                    >
                       <Download className="h-4 w-4" />
-                      Export
+                      <span className="hidden xs:inline">Export</span>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuItem onClick={handleExportPDF}>
+                  <DropdownMenuContent align="end" className="w-48 dark:bg-slate-900 dark:border-slate-800">
+                    <DropdownMenuItem onClick={handleExportPDF} className="dark:hover:bg-slate-800 dark:text-gray-300">
                       <FileText className="mr-2 h-4 w-4" />
                       Export to PDF
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleExportExcel}>
+                    <DropdownMenuItem onClick={handleExportExcel} className="dark:hover:bg-slate-800 dark:text-gray-300">
                       <FileSpreadsheet className="mr-2 h-4 w-4" />
                       Export to Excel
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleExportCSV}>
+                    <DropdownMenuItem onClick={handleExportCSV} className="dark:hover:bg-slate-800 dark:text-gray-300">
                       <FileSpreadsheet className="mr-2 h-4 w-4" />
                       Export to CSV
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <Button variant="outline" onClick={handlePrint}>
-                  <Printer className="mr-2 h-4 w-4" />
-                  Print
+
+                {/* Print Button */}
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handlePrint} 
+                  className="dark:bg-slate-800/50 dark:border-slate-700 dark:hover:bg-slate-700/50 dark:text-gray-200 gap-2 h-9 sm:h-10"
+                >
+                  <Printer className="h-4 w-4" />
+                  <span className="hidden sm:inline">Print</span>
                 </Button>
-                <Button onClick={handleAddClick} className="gap-2">
+
+                {/* Add Patient Button */}
+                <Button 
+                  onClick={handleAddClick} 
+                  size="sm"
+                  className="gap-2 h-9 sm:h-10 shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all"
+                >
                   <Plus className="h-4 w-4" />
                   Add Patient
                 </Button>
@@ -332,58 +367,50 @@ function RoundDetailContent({ roundId }: { roundId: string }) {
               <h2>{printSubheader}</h2>
               {doctorName && <p>Dr. {doctorName}</p>}
               <div>
-                Date: {new Date(round.date).toLocaleDateString()} | Round:{" "}
-                {round.round_number || "N/A"} | Total Patients:{" "}
+                Date: {new Date(round.date).toLocaleString()} | Round:{" "}
+                {wardName} | Total Patients:{" "}
                 {patients.length}
               </div>
               <hr />
             </div>
 
-            {/* Round Info */}
-            <div className="max-w-[1600px] mx-auto space-y-6">
+            {/* Ward Info */}
+            <div className="max-w-[1600px] mx-auto space-y-6 print:max-w-full print:mx-0 print:space-y-0">
               <Card className="border-0 shadow-lg print:hidden">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="flex items-center gap-2 text-lg">
                       <Calendar className="h-4 w-4" />
-                      Round Information
+                      Ward Information
                     </CardTitle>
-                    <Badge className="capitalize">{round.status}</Badge>
+                    <Badge className="capitalize bg-green-100 text-green-700 border-0">Active</Badge>
                   </div>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <dl className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <dl className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     <div>
-                      <dt className="text-xs font-medium text-gray-500">
-                        Date
+                      <dt className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                        Ward Name
                       </dt>
-                      <dd className="text-sm font-semibold mt-1">
-                        {new Date(round.date).toLocaleDateString()}
+                      <dd className="text-sm font-semibold mt-1 dark:text-gray-100">
+                        {wardName}
                       </dd>
                     </div>
                     <div>
-                      <dt className="text-xs font-medium text-gray-500">
-                        Round Number
+                      <dt className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                        Last Updated
                       </dt>
-                      <dd className="text-sm font-semibold mt-1">
-                        {round.round_number || "N/A"}
+                      <dd className="text-sm font-semibold mt-1 dark:text-gray-100">
+                        {new Date(round.date).toLocaleString()}
                       </dd>
                     </div>
                     <div>
-                      <dt className="text-xs font-medium text-gray-500">
+                      <dt className="text-xs font-medium text-gray-500 dark:text-gray-400">
                         Total Patients
                       </dt>
-                      <dd className="text-sm font-semibold flex items-center gap-2 mt-1">
+                      <dd className="text-sm font-semibold flex items-center gap-2 mt-1 dark:text-gray-100">
                         <Users className="h-3 w-3" />
                         {patients.length}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="text-xs font-medium text-gray-500">
-                        Status
-                      </dt>
-                      <dd className="text-sm font-semibold capitalize mt-1">
-                        {round.status}
                       </dd>
                     </div>
                   </dl>
@@ -391,7 +418,7 @@ function RoundDetailContent({ roundId }: { roundId: string }) {
               </Card>
 
               {/* Patient List */}
-              <div>
+              <div className="print:pt-0">
                 <PatientTable
                   patients={patients}
                   onEdit={handleEditClick}
@@ -411,18 +438,18 @@ function RoundDetailContent({ roundId }: { roundId: string }) {
         onSubmit={formMode === "create" ? handleAddPatient : handleEditPatient}
         patient={editingPatient}
         mode={formMode}
+        existingSerialNumbers={patients.map(p => p.serial_no || 0).filter(n => n > 0)}
+        suggestedSerialNo={Math.max(0, ...patients.map(p => p.serial_no || 0)) + 1}
       />
     </div>
   );
 }
 
-export default function RoundDetailPage() {
-  const params = useParams();
-  const roundId = params.id as string;
-
+export function WardDetail({ wardName }: WardDetailProps) {
   return (
     <ProtectedRoute>
-      <RoundDetailContent roundId={roundId} />
+      <WardDetailContent wardName={wardName} />
     </ProtectedRoute>
   );
 }
+

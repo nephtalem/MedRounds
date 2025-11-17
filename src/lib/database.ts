@@ -29,44 +29,18 @@ export const roundsDB = {
     return data;
   },
 
-  // Get active rounds
-  async getActive(): Promise<Round[]> {
+  // Get ward round by name
+  async getByWardName(wardName: string): Promise<Round | null> {
     const { data, error } = await supabase
       .from("rounds")
       .select("*")
-      .eq("status", "active")
-      .order("date", { ascending: false });
-
-    if (error) throw error;
-    return data || [];
-  },
-
-  // Get rounds by status
-  async getByStatus(status: string): Promise<Round[]> {
-    const { data, error } = await supabase
-      .from("rounds")
-      .select("*")
-      .eq("status", status)
-      .order("date", { ascending: false });
-
-    if (error) throw error;
-    return data || [];
-  },
-
-  // Create new round
-  async create(userId: string, roundData: Partial<Round>): Promise<Round> {
-    const { data, error } = await supabase
-      .from("rounds")
-      .insert({
-        user_id: userId,
-        date: roundData.date || new Date().toISOString().split("T")[0],
-        round_number: roundData.round_number,
-        status: roundData.status || "active",
-      })
-      .select()
+      .eq("round_number", wardName)
       .single();
 
-    if (error) throw error;
+    if (error) {
+      if (error.code === 'PGRST116') return null; // Not found
+      throw error;
+    }
     return data;
   },
 
@@ -81,13 +55,6 @@ export const roundsDB = {
 
     if (error) throw error;
     return data;
-  },
-
-  // Delete round (and all its patients due to CASCADE)
-  async delete(id: string): Promise<void> {
-    const { error } = await supabase.from("rounds").delete().eq("id", id);
-
-    if (error) throw error;
   },
 
   // Get round with patient count
@@ -146,7 +113,7 @@ export const patientsDB = {
   // Create new patient
   async create(
     roundId: string,
-    patientData: PatientFormData
+    patientData: PatientFormData & { serial_no?: number }
   ): Promise<Patient> {
     // Get round to fetch user_id
     const { data: round, error: roundError } = await supabase
@@ -157,26 +124,34 @@ export const patientsDB = {
 
     if (roundError) throw roundError;
 
-    // Get next serial number
-    const { data: existingPatients } = await supabase
-      .from("patients")
-      .select("serial_no")
-      .eq("round_id", roundId)
-      .order("serial_no", { ascending: false })
-      .limit(1);
+    // Use provided serial_no or calculate next one
+    let serialNo = patientData.serial_no;
+    
+    if (!serialNo) {
+      // Get next serial number only if not provided
+      const { data: existingPatients } = await supabase
+        .from("patients")
+        .select("serial_no")
+        .eq("round_id", roundId)
+        .order("serial_no", { ascending: false })
+        .limit(1);
 
-    const nextSerialNo =
-      existingPatients && existingPatients.length > 0
-        ? (existingPatients[0].serial_no || 0) + 1
-        : 1;
+      serialNo =
+        existingPatients && existingPatients.length > 0
+          ? (existingPatients[0].serial_no || 0) + 1
+          : 1;
+    }
+
+    // Remove serial_no from patientData to avoid duplication
+    const { serial_no: _, ...dataWithoutSerialNo } = patientData;
 
     const { data, error } = await supabase
       .from("patients")
       .insert({
         round_id: roundId,
-        user_id: round.user_id, // Add user_id for performance
-        serial_no: nextSerialNo,
-        ...patientData,
+        user_id: round.user_id,
+        serial_no: serialNo,
+        ...dataWithoutSerialNo,
       })
       .select()
       .single();

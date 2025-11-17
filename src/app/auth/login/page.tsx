@@ -95,7 +95,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50">
+    <div className="min-h-screen flex bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50 dark:from-[#030712] dark:via-slate-900/50 dark:to-[#030712]">
       {/* Left Side - Branding */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-blue-700 to-cyan-600 p-12 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -mr-48 -mt-48" />
@@ -170,7 +170,7 @@ export default function LoginPage() {
                 <Activity className="h-7 w-7 text-white" strokeWidth={2.5} />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">
                   MedRounds
                 </h1>
               </div>
@@ -178,10 +178,12 @@ export default function LoginPage() {
           </div>
 
           {/* Form Card */}
-          <Card className="border-0 shadow-2xl">
+          <Card className="border-0 shadow-2xl dark:bg-slate-900/60 dark:border-slate-800 dark:shadow-black/40">
             <CardHeader className="space-y-2 text-center pb-8">
-              <CardTitle className="text-3xl font-bold">Welcome Back</CardTitle>
-              <CardDescription className="text-base">
+              <CardTitle className="text-3xl font-bold dark:text-gray-100">
+                Welcome Back
+              </CardTitle>
+              <CardDescription className="text-base dark:text-gray-400">
                 Sign in to your account to continue
               </CardDescription>
             </CardHeader>
@@ -189,13 +191,15 @@ export default function LoginPage() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Error Alert */}
                 {error && (
-                  <div className="p-4 rounded-lg bg-red-50 border border-red-200 flex items-start gap-3">
-                    <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                  <div className="p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 flex items-start gap-3">
+                    <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-red-900">
+                      <p className="text-sm font-medium text-red-900 dark:text-red-300">
                         Sign in failed
                       </p>
-                      <p className="text-sm text-red-700 mt-1">{error}</p>
+                      <p className="text-sm text-red-700 dark:text-red-400 mt-1">
+                        {error}
+                      </p>
                     </div>
                   </div>
                 )}
@@ -204,12 +208,12 @@ export default function LoginPage() {
                 <div className="space-y-2">
                   <Label
                     htmlFor="email"
-                    className="text-sm font-semibold text-gray-700"
+                    className="text-sm font-semibold text-gray-700 dark:text-gray-300"
                   >
                     Email Address
                   </Label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
                     <Input
                       id="email"
                       type="email"
@@ -223,7 +227,7 @@ export default function LoginPage() {
                       }}
                       required
                       disabled={loading}
-                      className={`pl-10 h-12 border-2 focus:border-blue-500 ${
+                      className={`pl-10 h-12 border-2 focus:border-blue-500 dark:bg-slate-800/50 dark:border-slate-700 dark:text-gray-200 dark:placeholder:text-gray-500 ${
                         fieldErrors.email
                           ? "border-red-500 focus:border-red-500"
                           : ""
@@ -231,7 +235,7 @@ export default function LoginPage() {
                     />
                   </div>
                   {fieldErrors.email && (
-                    <p className="text-sm text-red-600 flex items-center gap-1">
+                    <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
                       <AlertCircle className="h-3.5 w-3.5" />
                       {fieldErrors.email}
                     </p>
@@ -243,19 +247,19 @@ export default function LoginPage() {
                   <div className="flex items-center justify-between">
                     <Label
                       htmlFor="password"
-                      className="text-sm font-semibold text-gray-700"
+                      className="text-sm font-semibold text-gray-700 dark:text-gray-300"
                     >
                       Password
                     </Label>
                     <Link
                       href="/auth/forgot-password"
-                      className="text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline"
+                      className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline"
                     >
                       Forgot password?
                     </Link>
                   </div>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
                     <Input
                       id="password"
                       type="password"
@@ -269,7 +273,7 @@ export default function LoginPage() {
                       }}
                       required
                       disabled={loading}
-                      className={`pl-10 h-12 border-2 focus:border-blue-500 ${
+                      className={`pl-10 h-12 border-2 focus:border-blue-500 dark:bg-slate-800/50 dark:border-slate-700 dark:text-gray-200 dark:placeholder:text-gray-500 ${
                         fieldErrors.password
                           ? "border-red-500 focus:border-red-500"
                           : ""
@@ -277,7 +281,7 @@ export default function LoginPage() {
                     />
                   </div>
                   {fieldErrors.password && (
-                    <p className="text-sm text-red-600 flex items-center gap-1">
+                    <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
                       <AlertCircle className="h-3.5 w-3.5" />
                       {fieldErrors.password}
                     </p>
@@ -296,7 +300,7 @@ export default function LoginPage() {
                   />
                   <Label
                     htmlFor="rememberMe"
-                    className="text-sm font-normal text-gray-700 cursor-pointer"
+                    className="text-sm font-normal text-gray-700 dark:text-gray-300 cursor-pointer"
                   >
                     Remember me
                   </Label>
@@ -324,10 +328,10 @@ export default function LoginPage() {
                 {/* Divider */}
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-200"></div>
+                    <div className="w-full border-t border-gray-200 dark:border-slate-700"></div>
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="px-4 bg-white text-gray-500 font-medium">
+                    <span className="px-4 bg-white dark:bg-slate-900 text-gray-500 dark:text-gray-400 font-medium">
                       New to MedRounds?
                     </span>
                   </div>
@@ -338,7 +342,7 @@ export default function LoginPage() {
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full h-12 text-base font-semibold border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700 transition-all duration-300"
+                    className="w-full h-12 text-base font-semibold border-2 border-gray-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-700 dark:hover:text-blue-400 transition-all duration-300 dark:bg-slate-800/50 dark:text-gray-200"
                   >
                     Create Account
                   </Button>
@@ -349,21 +353,27 @@ export default function LoginPage() {
 
           {/* Footer Links */}
           <div className="space-y-3">
-            <p className="text-center text-sm text-gray-600">
+            <p className="text-center text-sm text-gray-600 dark:text-gray-400">
               <Link
                 href="/about"
-                className="font-medium text-blue-600 hover:underline"
+                className="font-medium text-blue-600 dark:text-blue-400 hover:underline"
               >
                 Learn more about MedRounds
               </Link>
             </p>
-            <p className="text-center text-sm text-gray-600">
+            <p className="text-center text-sm text-gray-600 dark:text-gray-400">
               By signing in, you agree to our{" "}
-              <a href="#" className="font-medium text-blue-600 hover:underline">
+              <a
+                href="#"
+                className="font-medium text-blue-600 dark:text-blue-400 hover:underline"
+              >
                 Terms of Service
               </a>{" "}
               and{" "}
-              <a href="#" className="font-medium text-blue-600 hover:underline">
+              <a
+                href="#"
+                className="font-medium text-blue-600 dark:text-blue-400 hover:underline"
+              >
                 Privacy Policy
               </a>
             </p>

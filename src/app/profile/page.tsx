@@ -63,7 +63,7 @@ function ProfileContent() {
     : "Unknown";
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50">
+    <div className="flex h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50 dark:from-[#030712] dark:via-slate-900/50 dark:to-[#030712]">
       {/* Modern Sidebar */}
       <ModernSidebar />
 
@@ -106,21 +106,21 @@ function ProfileContent() {
             </Card>
 
             {/* Edit Profile Form */}
-            <Card className="border-0 shadow-lg">
+            <Card className="border-0 shadow-lg dark:bg-slate-900/40 dark:border-slate-800">
               <CardHeader>
-                <CardTitle className="text-xl font-bold flex items-center gap-2">
-                  <User className="h-5 w-5 text-blue-600" />
+                <CardTitle className="text-xl font-bold flex items-center gap-2 dark:text-gray-100">
+                  <User className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                   Personal Information
                 </CardTitle>
-                <CardDescription className="text-sm">
+                <CardDescription className="text-sm dark:text-gray-400">
                   Update your profile details
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {success && (
-                  <div className="p-4 rounded-lg bg-green-50 border-2 border-green-200 flex items-center gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-green-600" />
-                    <p className="text-sm font-medium text-green-900">
+                  <div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800 flex items-center gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
+                    <p className="text-sm font-medium text-green-900 dark:text-green-300">
                       Profile updated successfully!
                     </p>
                   </div>
@@ -128,11 +128,11 @@ function ProfileContent() {
 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="fullName" className="text-sm font-semibold">
+                    <Label htmlFor="fullName" className="text-sm font-semibold dark:text-gray-300">
                       Full Name
                     </Label>
                     <div className="relative">
-                      <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
                       <Input
                         id="fullName"
                         type="text"
@@ -140,26 +140,26 @@ function ProfileContent() {
                         onChange={(e) => setFullName(e.target.value)}
                         placeholder="Dr. John Smith"
                         disabled={loading}
-                        className="pl-10 h-12 border-2 focus:border-blue-500"
+                        className="pl-10 h-12 border-2 focus:border-blue-500 dark:bg-slate-800/50 dark:border-slate-700 dark:text-gray-200 dark:placeholder:text-gray-500"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="text-sm font-semibold">
+                    <Label htmlFor="email" className="text-sm font-semibold dark:text-gray-300">
                       Email Address
                     </Label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
                       <Input
                         id="email"
                         type="email"
                         value={user?.email || ""}
                         disabled
-                        className="pl-10 h-12 border-2 bg-gray-50 text-gray-500"
+                        className="pl-10 h-12 border-2 bg-gray-50 text-gray-500 dark:bg-slate-800/30 dark:border-slate-700 dark:text-gray-400"
                       />
                     </div>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
                       Email cannot be changed. Contact support if needed.
                     </p>
                   </div>
@@ -198,44 +198,44 @@ function ProfileContent() {
             </Card>
 
             {/* Account Information */}
-            <Card className="border-0 shadow-lg">
+            <Card className="border-0 shadow-lg dark:bg-slate-900/40 dark:border-slate-800">
               <CardHeader>
-                <CardTitle className="text-xl font-bold flex items-center gap-2">
-                  <Shield className="h-5 w-5 text-blue-600" />
+                <CardTitle className="text-xl font-bold flex items-center gap-2 dark:text-gray-100">
+                  <Shield className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                   Account Information
                 </CardTitle>
-                <CardDescription className="text-sm">
+                <CardDescription className="text-sm dark:text-gray-400">
                   Your account details and statistics
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <dl className="space-y-4">
-                  <div className="flex justify-between items-center py-3 border-b border-gray-100">
-                    <dt className="text-sm font-medium text-gray-600">Account Status</dt>
+                  <div className="flex justify-between items-center py-3 border-b border-gray-100 dark:border-slate-700">
+                    <dt className="text-sm font-medium text-gray-600 dark:text-gray-400">Account Status</dt>
                     <dd>
-                      <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-semibold">
-                        <div className="h-2 w-2 rounded-full bg-green-600"></div>
+                      <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 text-sm font-semibold">
+                        <div className="h-2 w-2 rounded-full bg-green-600 dark:bg-green-500"></div>
                         Active
                       </span>
                     </dd>
                   </div>
-                  <div className="flex justify-between items-center py-3 border-b border-gray-100">
-                    <dt className="text-sm font-medium text-gray-600">User ID</dt>
-                    <dd className="text-sm font-mono text-gray-900 bg-gray-100 px-3 py-1 rounded">
+                  <div className="flex justify-between items-center py-3 border-b border-gray-100 dark:border-slate-700">
+                    <dt className="text-sm font-medium text-gray-600 dark:text-gray-400">User ID</dt>
+                    <dd className="text-sm font-mono text-gray-900 dark:text-gray-300 bg-gray-100 dark:bg-slate-800/50 px-3 py-1 rounded">
                       {user?.id.slice(0, 8)}...
                     </dd>
                   </div>
-                  <div className="flex justify-between items-center py-3 border-b border-gray-100">
-                    <dt className="text-sm font-medium text-gray-600">Last Sign In</dt>
-                    <dd className="text-sm text-gray-900 font-medium">
+                  <div className="flex justify-between items-center py-3 border-b border-gray-100 dark:border-slate-700">
+                    <dt className="text-sm font-medium text-gray-600 dark:text-gray-400">Last Sign In</dt>
+                    <dd className="text-sm text-gray-900 dark:text-gray-300 font-medium">
                       {user?.last_sign_in_at
                         ? new Date(user.last_sign_in_at).toLocaleString()
                         : "N/A"}
                     </dd>
                   </div>
                   <div className="flex justify-between items-center py-3">
-                    <dt className="text-sm font-medium text-gray-600">Member Since</dt>
-                    <dd className="text-sm text-gray-900 font-medium">{joinedDate}</dd>
+                    <dt className="text-sm font-medium text-gray-600 dark:text-gray-400">Member Since</dt>
+                    <dd className="text-sm text-gray-900 dark:text-gray-300 font-medium">{joinedDate}</dd>
                   </div>
                 </dl>
               </CardContent>

@@ -62,7 +62,7 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50 p-4">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50 dark:from-[#030712] dark:via-slate-900/50 dark:to-[#030712] p-4">
           <Card className="max-w-2xl w-full border-0 shadow-2xl">
             <CardHeader className="text-center pb-4">
               <div className="flex justify-center mb-4">

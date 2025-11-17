@@ -23,7 +23,7 @@ export default function Home() {
 
   // Show loading state while checking authentication
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50 dark:from-[#030712] dark:via-slate-900/50 dark:to-[#030712]">
       <div className="text-center space-y-4">
         <Loader2 className="h-12 w-12 animate-spin mx-auto text-blue-600" />
         <p className="text-gray-600 font-medium">Loading MedRounds...</p>

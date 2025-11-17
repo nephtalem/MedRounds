@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { ThemeToggle } from "@/components/theme-toggle";
 import {
   Sidebar,
   SidebarContent,
@@ -27,13 +28,11 @@ import {
 import {
   ClipboardList,
   LayoutDashboard,
-  FileText,
+  Building2,
   Settings,
   User,
   LogOut,
   ChevronUp,
-  Plus,
-  History,
 } from "lucide-react";
 
 const navigationItems = [
@@ -43,24 +42,19 @@ const navigationItems = [
     href: "/dashboard",
   },
   {
-    title: "Active Rounds",
-    icon: ClipboardList,
-    href: "/rounds",
+    title: "Ward 3",
+    icon: Building2,
+    href: "/wards/ward-3",
   },
   {
-    title: "New Round",
-    icon: Plus,
-    href: "/rounds/new",
+    title: "Ward 4",
+    icon: Building2,
+    href: "/wards/ward-4",
   },
   {
-    title: "History",
-    icon: History,
-    href: "/rounds/history",
-  },
-  {
-    title: "Templates",
-    icon: FileText,
-    href: "/templates",
+    title: "ICU",
+    icon: Building2,
+    href: "/wards/icu",
   },
 ];
 
@@ -90,15 +84,17 @@ export function AppSidebar() {
           </div>
           <div className="flex flex-col">
             <span className="text-lg font-bold text-primary">MedRounds</span>
-            <span className="text-xs text-muted-foreground">Medical Rounds</span>
+            <span className="text-xs text-muted-foreground">
+              Medical Rounds
+            </span>
           </div>
         </div>
       </SidebarHeader>
 
       <SidebarContent>
-        {/* Main Navigation */}
+        {/* Main Navigation - WARDS */}
         <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupLabel>NAVIGATION</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {navigationItems.map((item) => (
@@ -139,6 +135,16 @@ export function AppSidebar() {
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Theme */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Theme</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <div className="px-2 py-2">
+              <ThemeToggle />
+            </div>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
@@ -197,4 +203,3 @@ export function AppSidebar() {
     </Sidebar>
   );
 }
-
