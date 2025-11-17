@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Card,
   CardContent,
@@ -40,6 +41,7 @@ export default function LoginPage() {
   const { signIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -74,7 +76,7 @@ export default function LoginPage() {
     const toastId = toast.loading("Signing in...");
 
     try {
-      const result = await signIn(email, password);
+      const result = await signIn(email, password, rememberMe);
 
       // Check if signIn returned an error
       if (result.error) {
@@ -280,6 +282,24 @@ export default function LoginPage() {
                       {fieldErrors.password}
                     </p>
                   )}
+                </div>
+
+                {/* Remember Me Checkbox */}
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="rememberMe"
+                    checked={rememberMe}
+                    onCheckedChange={(checked) =>
+                      setRememberMe(checked as boolean)
+                    }
+                    disabled={loading}
+                  />
+                  <Label
+                    htmlFor="rememberMe"
+                    className="text-sm font-normal text-gray-700 cursor-pointer"
+                  >
+                    Remember me
+                  </Label>
                 </div>
 
                 {/* Submit Button */}

@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Card,
   CardContent,
@@ -61,6 +62,7 @@ export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -98,7 +100,7 @@ export default function SignupPage() {
     const toastId = toast.loading("Creating your account...");
 
     try {
-      const result = await signUp(email, password, fullName);
+      const result = await signUp(email, password, fullName, rememberMe);
 
       // Check if signUp returned an error
       if (result.error) {
@@ -422,6 +424,24 @@ export default function SignupPage() {
                       {fieldErrors.confirmPassword}
                     </p>
                   )}
+                </div>
+
+                {/* Remember Me Checkbox */}
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="rememberMe"
+                    checked={rememberMe}
+                    onCheckedChange={(checked) =>
+                      setRememberMe(checked as boolean)
+                    }
+                    disabled={loading || success}
+                  />
+                  <Label
+                    htmlFor="rememberMe"
+                    className="text-sm font-normal text-gray-700 cursor-pointer"
+                  >
+                    Remember me
+                  </Label>
                 </div>
 
                 {/* Submit Button */}
