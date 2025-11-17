@@ -68,7 +68,7 @@ function ProfileContent() {
       <ModernSidebar />
 
       {/* Main Content */}
-      <main className="ml-64 flex-1 flex flex-col overflow-hidden">
+      <main className="flex-1 flex flex-col overflow-hidden md:ml-64">
         {/* Modern Header */}
         <ModernHeader
           title="Profile"

@@ -87,7 +87,7 @@ export default function DashboardPage() {
         <ModernSidebar />
 
       {/* Main Content */}
-      <main className="ml-64 flex-1 flex flex-col overflow-hidden">
+      <main className="flex-1 flex flex-col overflow-hidden md:ml-64">
         {/* Modern Header */}
         <ModernHeader
           title="Dashboard"
@@ -213,17 +213,17 @@ export default function DashboardPage() {
                 {loading ? (
                   <div className="space-y-3">
                     {[1, 2, 3].map((i) => (
-                      <div key={i} className="flex items-center justify-between p-5 rounded-xl border-2 border-gray-100">
-                        <div className="flex items-center gap-4 flex-1">
-                          <Skeleton className="h-12 w-12 rounded-xl bg-gray-200" />
-                          <div className="space-y-2 flex-1">
-                            <Skeleton className="h-5 w-32 bg-gray-200" />
-                            <Skeleton className="h-4 w-48 bg-gray-200" />
+                      <div key={i} className="flex items-center justify-between p-3 sm:p-5 rounded-xl border-2 border-gray-100">
+                        <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
+                          <Skeleton className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-gray-200 flex-shrink-0" />
+                          <div className="space-y-2 flex-1 min-w-0">
+                            <Skeleton className="h-4 sm:h-5 w-24 sm:w-32 bg-gray-200" />
+                            <Skeleton className="h-3 sm:h-4 w-32 sm:w-48 bg-gray-200" />
                           </div>
                         </div>
-                        <div className="flex items-center gap-3">
-                          <Skeleton className="h-6 w-16 rounded-full bg-gray-200" />
-                          <Skeleton className="h-5 w-5 rounded bg-gray-200" />
+                        <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                          <Skeleton className="hidden sm:block h-6 w-16 rounded-full bg-gray-200" />
+                          <Skeleton className="h-4 w-4 sm:h-5 sm:w-5 rounded bg-gray-200" />
                         </div>
                       </div>
                     ))}
@@ -246,34 +246,35 @@ export default function DashboardPage() {
                       <Link
                         key={round.id}
                         href={`/rounds/${round.id}`}
-                        className="group flex items-center justify-between p-5 rounded-xl border-2 border-gray-100 hover:border-blue-200 hover:bg-blue-50/50 transition-all duration-300 hover:shadow-md"
+                        className="group flex items-center justify-between p-3 sm:p-5 rounded-xl border-2 border-gray-100 hover:border-blue-200 hover:bg-blue-50/50 transition-all duration-300 hover:shadow-md"
                       >
-                        <div className="flex items-center gap-4">
-                          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-all duration-300">
-                            <Calendar className="h-6 w-6 text-white" strokeWidth={2.5} />
+                        <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
+                          <div className="flex h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-all duration-300">
+                            <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-white" strokeWidth={2.5} />
                           </div>
-                          <div>
-                            <p className="font-semibold text-gray-900 mb-1">
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-gray-900 mb-1 text-sm sm:text-base truncate">
                               {round.round_number || "Unnamed Round"}
                             </p>
-                            <div className="flex items-center gap-3 text-sm text-gray-600">
-                              <span className="flex items-center gap-1">
-                                <Calendar className="h-3.5 w-3.5" />
-                                {new Date(round.date).toLocaleDateString()}
+                            <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-600 flex-wrap">
+                              <span className="flex items-center gap-1 whitespace-nowrap">
+                                <Calendar className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                                <span className="hidden xs:inline">{new Date(round.date).toLocaleDateString()}</span>
+                                <span className="xs:hidden">{new Date(round.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                               </span>
-                              <span className="flex items-center gap-1">
-                                <Users className="h-3.5 w-3.5" />
-                                {round.patient_count} patient{round.patient_count !== 1 ? 's' : ''}
+                              <span className="flex items-center gap-1 whitespace-nowrap">
+                                <Users className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                                {round.patient_count} <span className="hidden xs:inline">patient{round.patient_count !== 1 ? 's' : ''}</span>
                               </span>
                             </div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-3">
-                          <Badge className="bg-blue-100 text-blue-700 border-0 capitalize px-3 py-1">
+                        <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                          <Badge className="hidden sm:inline-flex bg-blue-100 text-blue-700 border-0 capitalize px-3 py-1">
                             {round.status}
                           </Badge>
                           <svg
-                            className="h-5 w-5 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all duration-300"
+                            className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all duration-300"
                             fill="none"
                             strokeLinecap="round"
                             strokeLinejoin="round"

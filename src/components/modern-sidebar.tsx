@@ -50,7 +50,7 @@ export function ModernSidebar() {
   const { user, signOut } = useAuth();
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 bg-white border-r border-gray-200 flex flex-col">
+    <aside className="hidden md:flex md:fixed md:left-0 md:top-0 h-screen w-64 bg-white border-r border-gray-200 flex-col">
       {/* Logo & Brand */}
       <div className="px-6 h-[97px] border-b border-gray-200 flex items-center">
         <Link href="/dashboard" className="flex items-center gap-3 group">

@@ -148,7 +148,7 @@ function RoundDetailContent({ roundId }: { roundId: string }) {
     return (
       <div className="flex h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50">
         <ModernSidebar />
-        <main className="ml-64 flex-1 flex flex-col overflow-hidden">
+        <main className="flex-1 flex flex-col overflow-hidden md:ml-64">
           <ModernHeader title="Loading Round..." />
           <div className="flex-1 overflow-auto p-6 space-y-6">
             {/* Loading skeleton */}
@@ -188,7 +188,7 @@ function RoundDetailContent({ roundId }: { roundId: string }) {
     return (
       <div className="flex h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50">
         <ModernSidebar />
-        <main className="ml-64 flex-1 flex flex-col overflow-hidden">
+        <main className="flex-1 flex flex-col overflow-hidden md:ml-64">
           <ModernHeader title="Round Not Found" />
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center space-y-4">
@@ -217,7 +217,7 @@ function RoundDetailContent({ roundId }: { roundId: string }) {
     <div className="flex h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50">
       <ModernSidebar />
 
-      <main className="ml-64 flex-1 flex flex-col overflow-hidden">
+      <main className="flex-1 flex flex-col overflow-hidden md:ml-64">
         <ModernHeader
           title="Round Details"
           subtitle={`${new Date(round.date).toLocaleDateString()} • ${
