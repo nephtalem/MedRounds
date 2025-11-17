@@ -13,8 +13,9 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2 } from "lucide-react";
+import { Loader2, AlertCircle } from "lucide-react";
 import type { Patient, PatientFormData } from "@/types";
+import { toast } from "sonner";
 
 interface PatientFormProps {
   open: boolean;
@@ -24,8 +25,15 @@ interface PatientFormProps {
   mode: "create" | "edit";
 }
 
-export function PatientForm({ open, onOpenChange, onSubmit, patient, mode }: PatientFormProps) {
+export function PatientForm({
+  open,
+  onOpenChange,
+  onSubmit,
+  patient,
+  mode,
+}: PatientFormProps) {
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState<PatientFormData>({
     name: "",
     brief_history: "",
@@ -54,6 +62,7 @@ export function PatientForm({ open, onOpenChange, onSubmit, patient, mode }: Pat
         plan: patient.plan || "",
         round: patient.round || "",
       });
+      setErrors({});
     } else if (open && !patient) {
       // Reset form for create mode
       setFormData({
@@ -68,19 +77,43 @@ export function PatientForm({ open, onOpenChange, onSubmit, patient, mode }: Pat
         plan: "",
         round: "",
       });
+      setErrors({});
     }
   }, [open, patient]);
 
+  // Validate form
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    // Name is required
+    if (!formData.name.trim()) {
+      newErrors.name = "Patient name is required";
+    } else if (formData.name.trim().length < 2) {
+      newErrors.name = "Name must be at least 2 characters";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate form
+    if (!validateForm()) {
+      toast.error("Please fix the errors before submitting");
+      return;
+    }
+
     setLoading(true);
 
     try {
       await onSubmit(formData);
       onOpenChange(false);
+      setErrors({});
     } catch (error) {
       console.error("Error submitting form:", error);
-      alert("Failed to save patient. Please try again.");
+      toast.error("Failed to save patient. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -108,11 +141,22 @@ export function PatientForm({ open, onOpenChange, onSubmit, patient, mode }: Pat
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) => {
+                  setFormData({ ...formData, name: e.target.value });
+                  if (errors.name) setErrors({ ...errors, name: "" });
+                }}
                 placeholder="Patient name"
-                required
                 disabled={loading}
+                className={
+                  errors.name ? "border-red-500 focus-visible:ring-red-500" : ""
+                }
               />
+              {errors.name && (
+                <p className="text-sm text-red-600 flex items-center gap-1">
+                  <AlertCircle className="h-3.5 w-3.5" />
+                  {errors.name}
+                </p>
+              )}
             </div>
 
             {/* Brief History */}
@@ -123,7 +167,9 @@ export function PatientForm({ open, onOpenChange, onSubmit, patient, mode }: Pat
               <Textarea
                 id="brief_history"
                 value={formData.brief_history}
-                onChange={(e) => setFormData({ ...formData, brief_history: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, brief_history: e.target.value })
+                }
                 placeholder="Brief medical history..."
                 rows={3}
                 disabled={loading}
@@ -138,7 +184,9 @@ export function PatientForm({ open, onOpenChange, onSubmit, patient, mode }: Pat
               <Textarea
                 id="diagnosis"
                 value={formData.diagnosis}
-                onChange={(e) => setFormData({ ...formData, diagnosis: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, diagnosis: e.target.value })
+                }
                 placeholder="Current diagnosis..."
                 rows={2}
                 disabled={loading}
@@ -153,7 +201,12 @@ export function PatientForm({ open, onOpenChange, onSubmit, patient, mode }: Pat
               <Textarea
                 id="physical_examination"
                 value={formData.physical_examination}
-                onChange={(e) => setFormData({ ...formData, physical_examination: e.target.value })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    physical_examination: e.target.value,
+                  })
+                }
                 placeholder="Physical examination findings..."
                 rows={3}
                 disabled={loading}
@@ -168,7 +221,9 @@ export function PatientForm({ open, onOpenChange, onSubmit, patient, mode }: Pat
               <Textarea
                 id="imaging"
                 value={formData.imaging}
-                onChange={(e) => setFormData({ ...formData, imaging: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, imaging: e.target.value })
+                }
                 placeholder="Imaging results (X-ray, CT, MRI, etc.)..."
                 rows={2}
                 disabled={loading}
@@ -183,7 +238,9 @@ export function PatientForm({ open, onOpenChange, onSubmit, patient, mode }: Pat
               <Textarea
                 id="lab_result"
                 value={formData.lab_result}
-                onChange={(e) => setFormData({ ...formData, lab_result: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, lab_result: e.target.value })
+                }
                 placeholder="Laboratory test results..."
                 rows={2}
                 disabled={loading}
@@ -198,7 +255,9 @@ export function PatientForm({ open, onOpenChange, onSubmit, patient, mode }: Pat
               <Textarea
                 id="incident"
                 value={formData.incident}
-                onChange={(e) => setFormData({ ...formData, incident: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, incident: e.target.value })
+                }
                 placeholder="Any incidents or complications..."
                 rows={2}
                 disabled={loading}
@@ -213,7 +272,9 @@ export function PatientForm({ open, onOpenChange, onSubmit, patient, mode }: Pat
               <Textarea
                 id="medications"
                 value={formData.medications}
-                onChange={(e) => setFormData({ ...formData, medications: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, medications: e.target.value })
+                }
                 placeholder="Current medications and dosages..."
                 rows={3}
                 disabled={loading}
@@ -228,7 +289,9 @@ export function PatientForm({ open, onOpenChange, onSubmit, patient, mode }: Pat
               <Textarea
                 id="plan"
                 value={formData.plan}
-                onChange={(e) => setFormData({ ...formData, plan: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, plan: e.target.value })
+                }
                 placeholder="Treatment plan..."
                 rows={3}
                 disabled={loading}
@@ -243,7 +306,9 @@ export function PatientForm({ open, onOpenChange, onSubmit, patient, mode }: Pat
               <Input
                 id="round"
                 value={formData.round}
-                onChange={(e) => setFormData({ ...formData, round: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, round: e.target.value })
+                }
                 placeholder="Round information"
                 disabled={loading}
               />
@@ -277,4 +342,3 @@ export function PatientForm({ open, onOpenChange, onSubmit, patient, mode }: Pat
     </Dialog>
   );
 }
-

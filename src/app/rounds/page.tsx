@@ -195,7 +195,10 @@ function RoundsContent() {
                 <CardHeader className="pb-2 sm:pb-3 relative p-4 sm:p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-cyan-500 shadow-lg shadow-cyan-500/30">
-                      <Users className="h-5 w-5 sm:h-6 sm:w-6 text-white" strokeWidth={2.5} />
+                      <Users
+                        className="h-5 w-5 sm:h-6 sm:w-6 text-white"
+                        strokeWidth={2.5}
+                      />
                     </div>
                   </div>
                 </CardHeader>
@@ -357,7 +360,10 @@ function RoundsContent() {
                           key={round.id}
                           className="group flex items-center justify-between p-3 sm:p-5 rounded-xl border-2 border-gray-100 hover:border-blue-200 hover:bg-blue-50/50 transition-all duration-300"
                         >
-                          <Link href={`/rounds/${round.id}`} className="flex-1 min-w-0">
+                          <Link
+                            href={`/rounds/${round.id}`}
+                            className="flex-1 min-w-0"
+                          >
                             <div className="flex items-center gap-2 sm:gap-4">
                               <div className="flex h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-all duration-300">
                                 <Calendar
@@ -372,12 +378,25 @@ function RoundsContent() {
                                 <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-600 flex-wrap">
                                   <span className="flex items-center gap-1 whitespace-nowrap">
                                     <Calendar className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                                    <span className="hidden xs:inline">{new Date(round.date).toLocaleDateString()}</span>
-                                    <span className="xs:hidden">{new Date(round.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                                    <span className="hidden xs:inline">
+                                      {new Date(
+                                        round.date
+                                      ).toLocaleDateString()}
+                                    </span>
+                                    <span className="xs:hidden">
+                                      {new Date(round.date).toLocaleDateString(
+                                        "en-US",
+                                        { month: "short", day: "numeric" }
+                                      )}
+                                    </span>
                                   </span>
                                   <span className="flex items-center gap-1 whitespace-nowrap">
                                     <Users className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                                    {round.patient_count} <span className="hidden xs:inline">patient{round.patient_count !== 1 ? "s" : ""}</span>
+                                    {round.patient_count}{" "}
+                                    <span className="hidden xs:inline">
+                                      patient
+                                      {round.patient_count !== 1 ? "s" : ""}
+                                    </span>
                                   </span>
                                 </div>
                               </div>
@@ -411,7 +430,10 @@ function RoundsContent() {
                                 <Archive className="h-3.5 w-3.5 xs:h-4 xs:w-4" />
                               </Button>
                             </div>
-                            <Link href={`/rounds/${round.id}`} className="hidden xs:block">
+                            <Link
+                              href={`/rounds/${round.id}`}
+                              className="hidden xs:block"
+                            >
                               <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all duration-300" />
                             </Link>
                           </div>
@@ -500,23 +522,19 @@ function RoundsContent() {
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="roundNumber" className="text-sm font-semibold">
-                Round Name / Number
+                Select Ward
               </Label>
-              <Input
-                id="roundNumber"
-                placeholder="e.g., Morning Round - Ward A"
-                value={roundNumber}
-                onChange={(e) => setRoundNumber(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && roundNumber.trim()) {
-                    handleCreateRound();
-                  }
-                }}
-                className="h-12 border-2 focus:border-blue-500"
-                autoFocus
-              />
+              <Select value={roundNumber} onValueChange={setRoundNumber}>
+                <SelectTrigger className="h-12 border-2 focus:border-blue-500">
+                  <SelectValue placeholder="Choose a ward..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ward 3">Ward 3</SelectItem>
+                  <SelectItem value="ward 4">Ward 4</SelectItem>
+                </SelectContent>
+              </Select>
               <p className="text-xs text-gray-500">
-                This helps you identify the round later
+                Select which ward this round is for
               </p>
             </div>
           </div>

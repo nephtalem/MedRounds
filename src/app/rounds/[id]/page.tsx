@@ -24,7 +24,21 @@ import {
   Users,
   Printer,
   ArrowLeft,
+  Download,
+  FileSpreadsheet,
+  FileText,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  exportPatientsToExcel,
+  exportPatientsToCSV,
+  exportPatientsToPDF,
+} from "@/lib/export";
 
 function RoundDetailContent({ roundId }: { roundId: string }) {
   const { user } = useAuth();
@@ -144,6 +158,35 @@ function RoundDetailContent({ roundId }: { roundId: string }) {
     setFormOpen(true);
   }
 
+  function handleExportExcel() {
+    if (!round) return;
+    const roundName = round.round_number || "Round";
+    exportPatientsToExcel(patients, roundName);
+    toast.success("Exported to Excel successfully!");
+  }
+
+  function handleExportCSV() {
+    if (!round) return;
+    const roundName = round.round_number || "Round";
+    exportPatientsToCSV(patients, roundName);
+    toast.success("Exported to CSV successfully!");
+  }
+
+  function handleExportPDF() {
+    if (!round) return;
+    const roundName = round.round_number || "Round";
+    const roundDate = new Date(round.date).toLocaleDateString();
+    exportPatientsToPDF(
+      patients,
+      roundName,
+      roundDate,
+      printHeader,
+      printSubheader,
+      doctorName
+    );
+    toast.success("Exported to PDF successfully!");
+  }
+
   if (loading) {
     return (
       <div className="flex h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50">
@@ -247,6 +290,28 @@ function RoundDetailContent({ roundId }: { roundId: string }) {
                 </div>
               </div>
               <div className="flex items-center gap-3">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="gap-2">
+                      <Download className="h-4 w-4" />
+                      Export
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem onClick={handleExportPDF}>
+                      <FileText className="mr-2 h-4 w-4" />
+                      Export to PDF
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleExportExcel}>
+                      <FileSpreadsheet className="mr-2 h-4 w-4" />
+                      Export to Excel
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleExportCSV}>
+                      <FileSpreadsheet className="mr-2 h-4 w-4" />
+                      Export to CSV
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
                 <Button variant="outline" onClick={handlePrint}>
                   <Printer className="mr-2 h-4 w-4" />
                   Print

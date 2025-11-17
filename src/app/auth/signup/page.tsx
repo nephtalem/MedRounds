@@ -26,6 +26,33 @@ import {
   Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
+import { z } from "zod";
+
+// Zod validation schema
+const signupSchema = z
+  .object({
+    fullName: z
+      .string()
+      .min(2, "Name must be at least 2 characters")
+      .max(100, "Name must be less than 100 characters")
+      .regex(
+        /^[a-zA-Z\s.'-]+$/,
+        "Name can only contain letters, spaces, and . ' -"
+      ),
+    email: z
+      .string()
+      .min(1, "Email is required")
+      .email("Please enter a valid email address"),
+    password: z
+      .string()
+      .min(6, "Password must be at least 6 characters")
+      .max(100, "Password must be less than 100 characters"),
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 export default function SignupPage() {
   const router = useRouter();
@@ -37,22 +64,33 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setFieldErrors({});
 
-    if (password !== confirmPassword) {
-      const errorMsg = "Passwords do not match";
-      setError(errorMsg);
-      toast.error(errorMsg);
-      return;
-    }
+    // Validate form with Zod
+    const validationResult = signupSchema.safeParse({
+      fullName,
+      email,
+      password,
+      confirmPassword,
+    });
 
-    if (password.length < 6) {
-      const errorMsg = "Password must be at least 6 characters";
-      setError(errorMsg);
-      toast.error(errorMsg);
+    if (!validationResult.success) {
+      const errors: Record<string, string> = {};
+      validationResult.error.issues.forEach((err: z.ZodIssue) => {
+        if (err.path[0]) {
+          errors[err.path[0] as string] = err.message;
+        }
+      });
+      setFieldErrors(errors);
+
+      // Show first error in toast
+      const firstError = validationResult.error.issues[0];
+      toast.error(firstError.message);
       return;
     }
 
@@ -242,12 +280,27 @@ export default function SignupPage() {
                       type="text"
                       placeholder="Dr. John Smith"
                       value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
+                      onChange={(e) => {
+                        setFullName(e.target.value);
+                        if (fieldErrors.fullName) {
+                          setFieldErrors({ ...fieldErrors, fullName: "" });
+                        }
+                      }}
                       required
                       disabled={loading || success}
-                      className="pl-10 h-12 border-2 focus:border-blue-500"
+                      className={`pl-10 h-12 border-2 focus:border-blue-500 ${
+                        fieldErrors.fullName
+                          ? "border-red-500 focus:border-red-500"
+                          : ""
+                      }`}
                     />
                   </div>
+                  {fieldErrors.fullName && (
+                    <p className="text-sm text-red-600 flex items-center gap-1">
+                      <AlertCircle className="h-3.5 w-3.5" />
+                      {fieldErrors.fullName}
+                    </p>
+                  )}
                 </div>
 
                 {/* Email Field */}
@@ -265,12 +318,27 @@ export default function SignupPage() {
                       type="email"
                       placeholder="doctor@hospital.com"
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={(e) => {
+                        setEmail(e.target.value);
+                        if (fieldErrors.email) {
+                          setFieldErrors({ ...fieldErrors, email: "" });
+                        }
+                      }}
                       required
                       disabled={loading || success}
-                      className="pl-10 h-12 border-2 focus:border-blue-500"
+                      className={`pl-10 h-12 border-2 focus:border-blue-500 ${
+                        fieldErrors.email
+                          ? "border-red-500 focus:border-red-500"
+                          : ""
+                      }`}
                     />
                   </div>
+                  {fieldErrors.email && (
+                    <p className="text-sm text-red-600 flex items-center gap-1">
+                      <AlertCircle className="h-3.5 w-3.5" />
+                      {fieldErrors.email}
+                    </p>
+                  )}
                 </div>
 
                 {/* Password Field */}
@@ -288,15 +356,31 @@ export default function SignupPage() {
                       type="password"
                       placeholder="••••••••"
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange={(e) => {
+                        setPassword(e.target.value);
+                        if (fieldErrors.password) {
+                          setFieldErrors({ ...fieldErrors, password: "" });
+                        }
+                      }}
                       required
                       disabled={loading || success}
-                      className="pl-10 h-12 border-2 focus:border-blue-500"
+                      className={`pl-10 h-12 border-2 focus:border-blue-500 ${
+                        fieldErrors.password
+                          ? "border-red-500 focus:border-red-500"
+                          : ""
+                      }`}
                     />
                   </div>
-                  <p className="text-xs text-gray-500">
-                    Must be at least 6 characters
-                  </p>
+                  {fieldErrors.password ? (
+                    <p className="text-sm text-red-600 flex items-center gap-1">
+                      <AlertCircle className="h-3.5 w-3.5" />
+                      {fieldErrors.password}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-gray-500">
+                      Must be at least 6 characters
+                    </p>
+                  )}
                 </div>
 
                 {/* Confirm Password Field */}
@@ -314,12 +398,30 @@ export default function SignupPage() {
                       type="password"
                       placeholder="••••••••"
                       value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      onChange={(e) => {
+                        setConfirmPassword(e.target.value);
+                        if (fieldErrors.confirmPassword) {
+                          setFieldErrors({
+                            ...fieldErrors,
+                            confirmPassword: "",
+                          });
+                        }
+                      }}
                       required
                       disabled={loading || success}
-                      className="pl-10 h-12 border-2 focus:border-blue-500"
+                      className={`pl-10 h-12 border-2 focus:border-blue-500 ${
+                        fieldErrors.confirmPassword
+                          ? "border-red-500 focus:border-red-500"
+                          : ""
+                      }`}
                     />
                   </div>
+                  {fieldErrors.confirmPassword && (
+                    <p className="text-sm text-red-600 flex items-center gap-1">
+                      <AlertCircle className="h-3.5 w-3.5" />
+                      {fieldErrors.confirmPassword}
+                    </p>
+                  )}
                 </div>
 
                 {/* Submit Button */}

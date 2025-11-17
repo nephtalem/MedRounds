@@ -24,6 +24,16 @@ import {
   Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
+import { z } from "zod";
+
+// Zod validation schema for login
+const loginSchema = z.object({
+  email: z
+    .string()
+    .min(1, "Email is required")
+    .email("Please enter a valid email address"),
+  password: z.string().min(1, "Password is required"),
+});
 
 export default function LoginPage() {
   const router = useRouter();
@@ -32,12 +42,35 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setLoading(true);
+    setFieldErrors({});
 
+    // Validate form with Zod
+    const validationResult = loginSchema.safeParse({
+      email,
+      password,
+    });
+
+    if (!validationResult.success) {
+      const errors: Record<string, string> = {};
+      validationResult.error.issues.forEach((err: z.ZodIssue) => {
+        if (err.path[0]) {
+          errors[err.path[0] as string] = err.message;
+        }
+      });
+      setFieldErrors(errors);
+
+      // Show first error in toast
+      const firstError = validationResult.error.issues[0];
+      toast.error(firstError.message);
+      return;
+    }
+
+    setLoading(true);
     const toastId = toast.loading("Signing in...");
 
     try {
@@ -180,12 +213,27 @@ export default function LoginPage() {
                       type="email"
                       placeholder="doctor@hospital.com"
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={(e) => {
+                        setEmail(e.target.value);
+                        if (fieldErrors.email) {
+                          setFieldErrors({ ...fieldErrors, email: "" });
+                        }
+                      }}
                       required
                       disabled={loading}
-                      className="pl-10 h-12 border-2 focus:border-blue-500"
+                      className={`pl-10 h-12 border-2 focus:border-blue-500 ${
+                        fieldErrors.email
+                          ? "border-red-500 focus:border-red-500"
+                          : ""
+                      }`}
                     />
                   </div>
+                  {fieldErrors.email && (
+                    <p className="text-sm text-red-600 flex items-center gap-1">
+                      <AlertCircle className="h-3.5 w-3.5" />
+                      {fieldErrors.email}
+                    </p>
+                  )}
                 </div>
 
                 {/* Password Field */}
@@ -211,12 +259,27 @@ export default function LoginPage() {
                       type="password"
                       placeholder="••••••••"
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange={(e) => {
+                        setPassword(e.target.value);
+                        if (fieldErrors.password) {
+                          setFieldErrors({ ...fieldErrors, password: "" });
+                        }
+                      }}
                       required
                       disabled={loading}
-                      className="pl-10 h-12 border-2 focus:border-blue-500"
+                      className={`pl-10 h-12 border-2 focus:border-blue-500 ${
+                        fieldErrors.password
+                          ? "border-red-500 focus:border-red-500"
+                          : ""
+                      }`}
                     />
                   </div>
+                  {fieldErrors.password && (
+                    <p className="text-sm text-red-600 flex items-center gap-1">
+                      <AlertCircle className="h-3.5 w-3.5" />
+                      {fieldErrors.password}
+                    </p>
+                  )}
                 </div>
 
                 {/* Submit Button */}
