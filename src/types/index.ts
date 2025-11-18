@@ -10,6 +10,8 @@ export interface Round {
   status: RoundStatus;
   created_at: string;
   updated_at: string;
+  last_updated_by_email?: string;
+  last_updated_by_name?: string;
 }
 
 export interface Patient {

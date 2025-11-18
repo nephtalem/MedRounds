@@ -387,7 +387,7 @@ function WardDetailContent({ wardName }: WardDetailProps) {
                   </div>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <dl className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  <dl className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <div>
                       <dt className="text-xs font-medium text-gray-500 dark:text-gray-400">
                         Ward Name
@@ -402,6 +402,17 @@ function WardDetailContent({ wardName }: WardDetailProps) {
                       </dt>
                       <dd className="text-sm font-semibold mt-1 dark:text-gray-100">
                         {new Date(round.date).toLocaleString()}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                        Last Updated By
+                      </dt>
+                      <dd className="text-sm font-semibold mt-1 dark:text-gray-100">
+                        {round.last_updated_by_name || 
+                         (round.last_updated_by_email?.split('@')[0]?.charAt(0).toUpperCase() + 
+                          round.last_updated_by_email?.split('@')[0]?.slice(1)) || 
+                         'Not yet updated'}
                       </dd>
                     </div>
                     <div>

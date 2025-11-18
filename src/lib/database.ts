@@ -82,6 +82,25 @@ export const roundsDB = {
 };
 
 // ============================================
+// HELPER FUNCTIONS
+// ============================================
+
+// Update round's last updated by tracking
+async function updateRoundTracking(roundId: string) {
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (user) {
+    await supabase
+      .from("rounds")
+      .update({
+        last_updated_by_email: user.email,
+        last_updated_by_name: user.user_metadata?.full_name || user.user_metadata?.title || null,
+      })
+      .eq("id", roundId);
+  }
+}
+
+// ============================================
 // PATIENTS CRUD OPERATIONS
 // ============================================
 
@@ -157,6 +176,10 @@ export const patientsDB = {
       .single();
 
     if (error) throw error;
+    
+    // Update round tracking
+    await updateRoundTracking(roundId);
+    
     return data;
   },
 
@@ -165,6 +188,13 @@ export const patientsDB = {
     id: string,
     updates: Partial<PatientFormData>
   ): Promise<Patient> {
+    // Get patient's round_id first
+    const { data: patient } = await supabase
+      .from("patients")
+      .select("round_id")
+      .eq("id", id)
+      .single();
+
     const { data, error } = await supabase
       .from("patients")
       .update(updates)
@@ -173,14 +203,32 @@ export const patientsDB = {
       .single();
 
     if (error) throw error;
+    
+    // Update round tracking
+    if (patient?.round_id) {
+      await updateRoundTracking(patient.round_id);
+    }
+    
     return data;
   },
 
   // Delete patient
   async delete(id: string): Promise<void> {
+    // Get patient's round_id first (before deleting)
+    const { data: patient } = await supabase
+      .from("patients")
+      .select("round_id")
+      .eq("id", id)
+      .single();
+
     const { error } = await supabase.from("patients").delete().eq("id", id);
 
     if (error) throw error;
+    
+    // Update round tracking
+    if (patient?.round_id) {
+      await updateRoundTracking(patient.round_id);
+    }
   },
 
   // Search patients
