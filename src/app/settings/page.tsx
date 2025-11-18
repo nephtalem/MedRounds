@@ -48,7 +48,8 @@ function SettingsContent() {
       setPrintHeader(user.user_metadata.print_header || "");
       setPrintSubheader(user.user_metadata.print_subheader || "");
     }
-  }, [user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]); // Only run when user ID changes (i.e., different user logs in)
 
   async function handleSave() {
     setLoading(true);
@@ -116,7 +117,10 @@ function SettingsContent() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="fullName" className="text-sm font-semibold dark:text-gray-300">
+                  <Label
+                    htmlFor="fullName"
+                    className="text-sm font-semibold dark:text-gray-300"
+                  >
                     Full Name
                   </Label>
                   <div className="relative">
@@ -134,7 +138,10 @@ function SettingsContent() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="title" className="text-sm font-semibold dark:text-gray-300">
+                  <Label
+                    htmlFor="title"
+                    className="text-sm font-semibold dark:text-gray-300"
+                  >
                     Professional Title
                   </Label>
                   <div className="relative">
@@ -149,11 +156,16 @@ function SettingsContent() {
                       className="pl-10 h-12 border-2 focus:border-blue-500 dark:bg-slate-800/50 dark:border-slate-700 dark:text-gray-200 dark:placeholder:text-gray-500"
                     />
                   </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Default: Neurologist</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Default: Neurologist
+                  </p>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="hospital" className="text-sm font-semibold dark:text-gray-300">
+                  <Label
+                    htmlFor="hospital"
+                    className="text-sm font-semibold dark:text-gray-300"
+                  >
                     Hospital / Institution
                   </Label>
                   <div className="relative">
@@ -303,7 +315,10 @@ function SettingsContent() {
                       </li>
                       <li>• Keep headers concise for better print layout</li>
                       <li>• Headers appear on all printed patient rounds</li>
-                      <li>• Leave blank to use Axon Stroke and Spine Center defaults</li>
+                      <li>
+                        • Leave blank to use Axon Stroke and Spine Center
+                        defaults
+                      </li>
                     </ul>
                   </div>
                 </div>

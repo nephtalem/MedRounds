@@ -31,7 +31,8 @@ function ProfileContent() {
     if (user?.user_metadata?.full_name) {
       setFullName(user.user_metadata.full_name);
     }
-  }, [user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]); // Only run when user ID changes (i.e., different user logs in)
 
   async function handleUpdateProfile() {
     setLoading(true);
