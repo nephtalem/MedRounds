@@ -410,8 +410,10 @@ function WardDetailContent({ wardName }: WardDetailProps) {
                       </dt>
                       <dd className="text-sm font-semibold mt-1 dark:text-gray-100">
                         {round.last_updated_by_name || 
-                         (round.last_updated_by_email?.split('@')[0]?.charAt(0).toUpperCase() + 
-                          round.last_updated_by_email?.split('@')[0]?.slice(1)) || 
+                         (round.last_updated_by_email ? 
+                           round.last_updated_by_email.split('@')[0].charAt(0).toUpperCase() + 
+                           round.last_updated_by_email.split('@')[0].slice(1) 
+                           : null) || 
                          'Not yet updated'}
                       </dd>
                     </div>
