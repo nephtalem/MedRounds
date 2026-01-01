@@ -20,11 +20,9 @@ import { toast } from "sonner";
 interface PatientFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: PatientFormData & { serial_no?: number }) => Promise<void>;
+  onSubmit: (data: PatientFormData) => Promise<void>;
   patient?: Patient | null;
   mode: "create" | "edit";
-  existingSerialNumbers?: number[];
-  suggestedSerialNo?: number;
 }
 
 export function PatientForm({
@@ -33,14 +31,12 @@ export function PatientForm({
   onSubmit,
   patient,
   mode,
-  existingSerialNumbers = [],
-  suggestedSerialNo = 1,
 }: PatientFormProps) {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [serialNo, setSerialNo] = useState<number | "">(suggestedSerialNo);
   const [formData, setFormData] = useState<PatientFormData>({
     name: "",
+    bed_number: "",
     brief_history: "",
     diagnosis: "",
     physical_examination: "",
@@ -63,6 +59,7 @@ export function PatientForm({
     if (open && patient) {
       setFormData({
         name: patient.name || "",
+        bed_number: patient.bed_number || "",
         brief_history: patient.brief_history || "",
         diagnosis: patient.diagnosis || "",
         physical_examination: patient.physical_examination || "",
@@ -73,12 +70,12 @@ export function PatientForm({
         plan: patient.plan || "",
         round: patient.round || "",
       });
-      setSerialNo(patient.serial_no || 1);
       setErrors({});
     } else if (open && !patient) {
       // Reset form for create mode
       setFormData({
         name: "",
+        bed_number: "",
         brief_history: "",
         diagnosis: "",
         physical_examination: "",
@@ -89,10 +86,9 @@ export function PatientForm({
         plan: "",
         round: "",
       });
-      setSerialNo(suggestedSerialNo);
       setErrors({});
     }
-  }, [open, patient, suggestedSerialNo]);
+  }, [open, patient]);
 
   // Validate form
   const validateForm = (): boolean => {
@@ -103,15 +99,6 @@ export function PatientForm({
       newErrors.name = "Patient name is required";
     } else if (formData.name.trim().length < 2) {
       newErrors.name = "Name must be at least 2 characters";
-    }
-
-    // Serial number validation (only for create mode)
-    if (mode === "create") {
-      if (serialNo === "" || serialNo < 1) {
-        newErrors.serial_no = "Serial number is required and must be at least 1";
-      } else if (existingSerialNumbers.includes(serialNo)) {
-        newErrors.serial_no = `Serial number #${serialNo} is already taken`;
-      }
     }
 
     setErrors(newErrors);
@@ -130,12 +117,7 @@ export function PatientForm({
     setLoading(true);
 
     try {
-      // Include serial_no only for create mode
-      const dataToSubmit = mode === "create" 
-        ? { ...formData, serial_no: typeof serialNo === "number" ? serialNo : undefined }
-        : formData;
-      
-      await onSubmit(dataToSubmit);
+      await onSubmit(formData);
       onOpenChange(false);
       setErrors({});
     } catch (error) {
@@ -160,61 +142,10 @@ export function PatientForm({
 
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
-            {/* Serial Number - Create Mode Only */}
-            {mode === "create" && (
-              <div className="grid gap-2 p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
-                <Label htmlFor="serial_no" className="font-semibold text-blue-900">
-                  Serial Number <span className="text-red-500">*</span>
-                </Label>
-                <div className="flex items-center gap-2">
-                  <Input
-                    id="serial_no"
-                    type="number"
-                    min="1"
-                    value={serialNo}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      if (value === "") {
-                        setSerialNo("");
-                      } else {
-                        const numValue = parseInt(value);
-                        if (!isNaN(numValue)) {
-                          setSerialNo(numValue);
-                        }
-                      }
-                      if (errors.serial_no) setErrors({ ...errors, serial_no: "" });
-                    }}
-                    disabled={loading}
-                    placeholder="Enter number"
-                    className={`w-32 font-mono text-lg ${
-                      errors.serial_no ? "border-red-500 focus-visible:ring-red-500" : "border-blue-300"
-                    }`}
-                  />
-                  <span className="text-sm text-blue-700 font-medium">
-                    Suggested: #{suggestedSerialNo}
-                  </span>
-                </div>
-                {existingSerialNumbers.length > 0 && (
-                  <p className="text-xs text-blue-600">
-                    <strong>Taken:</strong> {existingSerialNumbers.sort((a, b) => a - b).map(n => `#${n}`).join(", ")}
-                  </p>
-                )}
-                {errors.serial_no && (
-                  <p className="text-sm text-red-600 flex items-center gap-1">
-                    <AlertCircle className="h-3.5 w-3.5" />
-                    {errors.serial_no}
-                  </p>
-                )}
-                <p className="text-xs text-blue-700">
-                  💡 You can choose any available number. Suggested is the next highest, but you can fill gaps from discharged patients.
-                </p>
-              </div>
-            )}
-
             {/* Name - Required */}
             <div className="grid gap-2">
               <Label htmlFor="name" className="font-semibold">
-                {mode === "create" ? "1" : "1"}. Name <span className="text-red-500">*</span>
+                1. Name <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="name"
@@ -237,10 +168,27 @@ export function PatientForm({
               )}
             </div>
 
+            {/* Bed Number */}
+            <div className="grid gap-2">
+              <Label htmlFor="bed_number" className="font-semibold">
+                2. Bed No.
+              </Label>
+              <Input
+                id="bed_number"
+                value={formData.bed_number}
+                onChange={(e) =>
+                  setFormData({ ...formData, bed_number: e.target.value })
+                }
+                placeholder="e.g., 101, 203"
+                disabled={loading}
+                className="w-32"
+              />
+            </div>
+
             {/* Brief History */}
             <div className="grid gap-2">
               <Label htmlFor="brief_history" className="font-semibold">
-                2. Brief History
+                3. Brief History
               </Label>
               <Textarea
                 id="brief_history"
@@ -263,7 +211,7 @@ export function PatientForm({
             {/* Diagnosis */}
             <div className="grid gap-2">
               <Label htmlFor="diagnosis" className="font-semibold">
-                3. Diagnosis
+                4. Diagnosis
               </Label>
               <Textarea
                 id="diagnosis"
@@ -286,7 +234,7 @@ export function PatientForm({
             {/* Physical Examination */}
             <div className="grid gap-2">
               <Label htmlFor="physical_examination" className="font-semibold">
-                4. Physical Examination
+                5. Physical Examination
               </Label>
               <Textarea
                 id="physical_examination"
@@ -312,7 +260,7 @@ export function PatientForm({
             {/* Imaging */}
             <div className="grid gap-2">
               <Label htmlFor="imaging" className="font-semibold">
-                5. Imaging
+                6. Imaging
               </Label>
               <Textarea
                 id="imaging"
@@ -335,7 +283,7 @@ export function PatientForm({
             {/* Lab Result */}
             <div className="grid gap-2">
               <Label htmlFor="lab_result" className="font-semibold">
-                6. Lab Result
+                7. Lab Result
               </Label>
               <Textarea
                 id="lab_result"
@@ -358,7 +306,7 @@ export function PatientForm({
             {/* Incident */}
             <div className="grid gap-2">
               <Label htmlFor="incident" className="font-semibold">
-                7. Incident
+                8. Incident
               </Label>
               <Textarea
                 id="incident"
@@ -381,7 +329,7 @@ export function PatientForm({
             {/* Medications */}
             <div className="grid gap-2">
               <Label htmlFor="medications" className="font-semibold">
-                8. Medications
+                9. Medications
               </Label>
               <Textarea
                 id="medications"
@@ -404,7 +352,7 @@ export function PatientForm({
             {/* Plan */}
             <div className="grid gap-2">
               <Label htmlFor="plan" className="font-semibold">
-                9. Plan
+                10. Plan
               </Label>
               <Textarea
                 id="plan"
@@ -427,7 +375,7 @@ export function PatientForm({
             {/* Round */}
             <div className="grid gap-2">
               <Label htmlFor="round" className="font-semibold">
-                10. Round
+                11. Round
               </Label>
               <Input
                 id="round"

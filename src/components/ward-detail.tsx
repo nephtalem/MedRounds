@@ -169,6 +169,39 @@ function WardDetailContent({ wardName }: WardDetailProps) {
     }
   }
 
+  async function handleReorderPatients(orderedPatientIds: string[]) {
+    if (!round) return;
+
+    console.log("Reordering patients:", orderedPatientIds.length, "patients");
+    console.log("Current patients count:", patients.length);
+
+    // Optimistically update local state - rebuild full list with new order
+    const reorderedPatients = orderedPatientIds
+      .map((id) => patients.find((p) => p.id === id))
+      .filter((p): p is Patient => p !== undefined)
+      .map((p, index) => ({ ...p, serial_no: index + 1 }));
+    
+    console.log("Reordered patients count:", reorderedPatients.length);
+    
+    // Only update if we have all patients
+    if (reorderedPatients.length === patients.length) {
+      setPatients(reorderedPatients);
+    }
+
+    try {
+      await patientsDB.updateOrder(round.id, orderedPatientIds);
+      console.log("Database update complete");
+      // Reload to ensure we have the correct data from server
+      await loadData();
+      toast.success("Patient order updated!");
+    } catch (error) {
+      console.error("Error reordering patients:", error);
+      toast.error("Failed to update order");
+      // Reload to restore original order
+      await loadData();
+    }
+  }
+
   function handleEditClick(patient: Patient) {
     setEditingPatient(patient);
     setFormMode("edit");
@@ -436,6 +469,7 @@ function WardDetailContent({ wardName }: WardDetailProps) {
                   patients={patients}
                   onEdit={handleEditClick}
                   onDelete={handleDeletePatient}
+                  onReorder={handleReorderPatients}
                 />
               </div>
             </div>
@@ -451,8 +485,6 @@ function WardDetailContent({ wardName }: WardDetailProps) {
         onSubmit={formMode === "create" ? handleAddPatient : handleEditPatient}
         patient={editingPatient}
         mode={formMode}
-        existingSerialNumbers={patients.map(p => p.serial_no || 0).filter(n => n > 0)}
-        suggestedSerialNo={Math.max(0, ...patients.map(p => p.serial_no || 0)) + 1}
       />
     </div>
   );

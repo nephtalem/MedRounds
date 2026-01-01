@@ -193,6 +193,7 @@ function PatientDetailContent({ patientId }: { patientId: string }) {
       bgColor: "bg-blue-50",
       fields: [
         { label: "Serial No", value: `#${patient.serial_no || "N/A"}` },
+        { label: "Bed No.", value: patient.bed_number || "N/A" },
         { label: "Name", value: patient.name || "N/A" },
         { label: "Ward", value: wardName || "N/A" },
       ],
@@ -355,8 +356,6 @@ function PatientDetailContent({ patientId }: { patientId: string }) {
         onSubmit={handleEditPatient}
         patient={patient}
         mode="edit"
-        existingSerialNumbers={[]}
-        suggestedSerialNo={1}
       />
 
       {/* Delete Confirmation Dialog */}

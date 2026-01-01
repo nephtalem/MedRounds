@@ -21,6 +21,7 @@ export interface Patient {
 
   // Patient Data Fields (from Excel)
   name: string;
+  bed_number?: string;
   brief_history?: string;
   diagnosis?: string;
   physical_examination?: string;
@@ -44,6 +45,7 @@ export interface RoundWithPatients extends Round {
 
 export interface PatientFormData {
   name: string;
+  bed_number: string;
   brief_history: string;
   diagnosis: string;
   physical_examination: string;

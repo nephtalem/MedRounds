@@ -212,7 +212,7 @@ export const patientsDB = {
     return data;
   },
 
-  // Delete patient
+  // Delete patient and resequence serial numbers
   async delete(id: string): Promise<void> {
     // Get patient's round_id first (before deleting)
     const { data: patient } = await supabase
@@ -225,10 +225,57 @@ export const patientsDB = {
 
     if (error) throw error;
     
-    // Update round tracking
+    // Resequence remaining patients to avoid gaps
     if (patient?.round_id) {
+      await this.resequenceSerialNumbers(patient.round_id);
       await updateRoundTracking(patient.round_id);
     }
+  },
+
+  // Resequence serial numbers to ensure no gaps (1, 2, 3, ...)
+  async resequenceSerialNumbers(roundId: string): Promise<void> {
+    // Get all patients ordered by current serial_no
+    const { data: patients, error: fetchError } = await supabase
+      .from("patients")
+      .select("id, serial_no")
+      .eq("round_id", roundId)
+      .order("serial_no", { ascending: true });
+
+    if (fetchError) throw fetchError;
+    if (!patients || patients.length === 0) return;
+
+    // Update all in parallel
+    const updates = patients.map((patient, index) =>
+      supabase
+        .from("patients")
+        .update({ serial_no: index + 1 })
+        .eq("id", patient.id)
+    );
+
+    await Promise.all(updates);
+  },
+
+  // Update patient order (for drag and drop)
+  async updateOrder(roundId: string, orderedPatientIds: string[]): Promise<void> {
+    // Update all patients in parallel for speed
+    const updates = orderedPatientIds.map((id, index) =>
+      supabase
+        .from("patients")
+        .update({ serial_no: index + 1 })
+        .eq("id", id)
+    );
+
+    const results = await Promise.all(updates);
+    
+    // Check for errors
+    const failed = results.find(r => r.error);
+    if (failed?.error) {
+      console.error("Error updating patient order:", failed.error.message);
+      throw new Error(failed.error.message);
+    }
+
+    // Update round tracking
+    await updateRoundTracking(roundId);
   },
 
   // Search patients
